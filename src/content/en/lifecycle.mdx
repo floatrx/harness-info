@@ -151,14 +151,30 @@ way `AGENT_CMD` replaces the agent; the self-tests use it.
   [#1](https://github.com/floatrx/harness-demo-bookmarks/pull/1). It is a delivery demo by the stand-in agent, so the fake agent wrote the
   code, not Claude. [#2](https://github.com/floatrx/harness-demo-bookmarks/pull/2) followed a real-Claude run of T-004: 13 units, where a
   clean run takes 5; the 8 extra units are the lessons the pilot fixed. [#3](https://github.com/floatrx/harness-demo-bookmarks/pull/3) is
-  T-001, a UI task, in a clean real-Claude run of 7 units. All of them stay open, because merging is yours.
+  T-001, a UI task, in a clean real-Claude run of 7 units, and [#4](https://github.com/floatrx/harness-demo-bookmarks/pull/4) is T-003,
+  where the judge rejected the first round. All of them stay open, because merging is yours.
 </Note>
 
 <Shot name="delivered" plain />
 
 ## What one task costs
 
-A full task runs up to six agent units: spec, plan, prototype, implement, qa and judge, each with a fresh
-coordinator. Delivery adds a runner step that spends no tokens. That is more than a single long session would use. The trade is visibility, since every card rests in the
-column that owns it, and a clean context for every role. harness-demo measures the real cost per stage in its pilot
-before anyone tunes it.
+A task from draft to pull request is five agent units, each with a fresh context: spec, plan, implement, qa and
+judge. A UI task adds a prototype round, and an interview adds one more spec unit. Delivery is a runner step that
+spends no tokens. That is more than a single long session would use. The trade is visibility, since every card rests
+in the column that owns it, and a clean context for every role.
+
+harness-demo measured it on a pilot: three real tasks on the bookmarks example, run by `claude -p` on a subscription
+login with the default models, gated autonomy and delivery on. Claude passed the human gates on the recommended
+options. All three tasks ended in an open pull request, and nothing was merged.
+
+| Task                                   | Kind  | What happened                                                                                 | Units | Agent time | Tokens | API-equivalent | Pull request                                                   |
+| -------------------------------------- | ----- | --------------------------------------------------------------------------------------------- | ----- | ---------- | ------ | -------------- | -------------------------------------------------------------- |
+| T-004 Show when a bookmark was added   | logic | the plan sent back once; three harness bugs parked it on the way, each fixed                  | 13    | 6:51       | 25.0k  | $2.30          | [#2](https://github.com/floatrx/harness-demo-bookmarks/pull/2) |
+| T-001 Search box that filters the list | ui    | a 2-question interview, the prototype accepted on round 1, no bounce                          | 7     | 3:21       | 11.1k  | $1.68          | [#3](https://github.com/floatrx/harness-demo-bookmarks/pull/3) |
+| T-003 Make the bookmarks better        | vague | a 4-question interview, the plan sent back once; the judge rejected round 1, round 2 fixed it | 14    | 7:48       | 18.7k  | $2.86          | [#4](https://github.com/floatrx/harness-demo-bookmarks/pull/4) |
+
+Across the pilot, `harness stats` counted 39 units, 5 of them the stand-in's, and 5 parked units: 18:03 of agent time,
+54.7k tokens and $6.83 API-equivalent. Tokens are input plus output. Prompt-cache reads come on top and cost much less.
+On a subscription login the API-equivalent is what the same tokens would cost on the API, not a bill. Every failure
+became a contract or a prompt line with a test; the [lessons](/lessons) page lists the general ones.
