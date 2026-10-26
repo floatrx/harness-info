@@ -13,6 +13,8 @@
     "skip": "Skip to content",
     "demo": "Demo",
     "demoTip": "Demo repo on GitHub",
+    "example": "Example",
+    "exampleTip": "Example project: the pull requests the loop opened",
     "githubTip": "This site's code",
     "chaptersMeta": "10 chapters · ~55 min",
     "here": "you are here",
@@ -88,6 +90,7 @@
   "home": {
     "title": "A harness runs Claude Code unattended",
     "lead": "A harness is a small program around Claude Code. It gives the agent one unit of work at a time, checks the result with code instead of taking the agent's word, and keeps all its state in files. A run can go for hours, and you can pause it at any time: it stops after the unit in flight.",
+    "example": "The example project, live: <link>floatrx/harness-demo-bookmarks</link> — four pull requests opened by the loop, three of them by real Claude.",
     "primary": "Start with the concepts",
     "secondary": "Try it in 5 minutes",
     "flowTitle": "One task, thirteen columns",

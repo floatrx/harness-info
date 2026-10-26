@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { ChapterList } from '@/components/shell/chapter-list';
-import { CloseIcon, DemoIcon, GithubIcon, HomeIcon, ListIcon } from '@/components/shell/icons';
+import { CloseIcon, DemoIcon, ExampleIcon, GithubIcon, HomeIcon, ListIcon } from '@/components/shell/icons';
 import { useChapter } from '@/components/shell/use-chapter';
 import { siteConfig } from '@/config/site';
 import { Link } from '@/i18n/navigation';
@@ -83,7 +83,7 @@ export const BottomBar = () => {
         <div className="px-2.5 pt-1 pb-2.5">
           <ChapterList large onNavigate={close} />
         </div>
-        <div className="grid grid-cols-3 gap-1.5 border-t border-line-soft px-2.5 pt-2.5 pb-1">
+        <div className="grid grid-cols-4 gap-1.5 border-t border-line-soft px-2.5 pt-2.5 pb-1">
           <Link
             href="/"
             onClick={close}
@@ -96,6 +96,10 @@ export const BottomBar = () => {
           <a href={siteConfig.demoRepo} target="_blank" rel="noopener noreferrer" className={sheetLink}>
             <DemoIcon className="size-[18px]" />
             {t('nav.demo')}
+          </a>
+          <a href={siteConfig.exampleRepo} target="_blank" rel="noopener noreferrer" className={sheetLink}>
+            <ExampleIcon className="size-[18px]" />
+            {t('nav.example')}
           </a>
           <a href={siteConfig.repo} target="_blank" rel="noopener noreferrer" className={sheetLink}>
             <GithubIcon className="size-[18px]" />

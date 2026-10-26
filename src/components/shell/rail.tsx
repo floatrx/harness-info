@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 
 import { useTranslations } from 'next-intl';
 
-import { DemoIcon, ExternalIcon, GithubIcon, GuideIcon, HomeIcon, MarkIcon } from '@/components/shell/icons';
+import { DemoIcon, ExampleIcon, ExternalIcon, GithubIcon, GuideIcon, HomeIcon, MarkIcon } from '@/components/shell/icons';
 import { useChapter } from '@/components/shell/use-chapter';
 import { docSlugs } from '@/config/navigation';
 import { siteConfig } from '@/config/site';
@@ -63,6 +63,7 @@ export const Rail = () => {
       </Link>
       <span aria-hidden className="mt-auto mb-1.5 w-8 border-t border-line-soft" />
       <External href={siteConfig.demoRepo} icon={<DemoIcon className="size-[19px]" />} text={t('demo')} tip={t('demoTip')} />
+      <External href={siteConfig.exampleRepo} icon={<ExampleIcon className="size-[19px]" />} text={t('example')} tip={t('exampleTip')} />
       <External href={siteConfig.repo} icon={<GithubIcon className="size-[19px]" />} text={t('github')} tip={t('githubTip')} />
     </nav>
   );

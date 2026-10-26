@@ -46,6 +46,12 @@ export const DemoIcon = (props: IconProps) => (
   </Stroke>
 );
 
+export const ExampleIcon = (props: IconProps) => (
+  <Stroke {...props}>
+    <path d="M6 3.5h8a1 1 0 0 1 1 1V17l-5-3.2L5 17V4.5a1 1 0 0 1 1-1z" />
+  </Stroke>
+);
+
 export const ExternalIcon = (props: IconProps) => (
   <Stroke {...props}>
     <path d="M7 4h9v9M16 4 5 15" />

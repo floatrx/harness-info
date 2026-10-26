@@ -7,6 +7,7 @@ import { GoalLine } from '@/components/doc/goal-line';
 import { Dock } from '@/components/shell/dock';
 import { TopLine } from '@/components/shell/top-line';
 import { docSlugs } from '@/config/navigation';
+import { siteConfig } from '@/config/site';
 import { Link } from '@/i18n/navigation';
 import { pageMetadata } from '@/lib/metadata';
 
@@ -41,6 +42,20 @@ export default async function HomePage() {
           </h1>
           <GoalLine label={t('doc.goalShort')} text={t('home.goal')} />
           <p className="mt-4 max-w-[66ch] text-[16px] leading-relaxed text-ink">{t('home.lead')}</p>
+          <p className="mt-3 max-w-[66ch] text-[14.5px] leading-normal text-ink-mute">
+            {t.rich('home.example', {
+              link: (chunks) => (
+                <a
+                  href={siteConfig.exampleRepo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent underline decoration-accent-line underline-offset-[3px] hover:decoration-accent"
+                >
+                  {chunks}
+                </a>
+              ),
+            })}
+          </p>
           <div className="mt-5 hidden flex-wrap gap-2.5 min-[900px]:flex">
             <Link
               href={`/${docSlugs[0]}`}
