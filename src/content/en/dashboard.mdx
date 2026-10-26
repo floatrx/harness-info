@@ -38,6 +38,13 @@ A task with `kind: ui` stops in `prototype` before it is built, and the drawer o
 
 <Shot name="prototype-review" />
 
+## A task: delivered
+
+With `deliver.pr` on, a done task gets one more runner step: a push and a pull request. The board shows both
+sides of it.
+
+<Shot name="delivered" />
+
 ## Live
 
 Live trace shows what a unit does while it runs, and what every earlier unit did.
@@ -46,7 +53,9 @@ Live trace shows what a unit does while it runs, and what every earlier unit did
 
 ## Stats
 
-Stats adds up the usage each unit reported, per stage and per task.
+Stats adds up the usage each unit reported, per stage and per task. Cost is the API-equivalent price `claude -p`
+reports: a subscription login is not billed per token, and usage limits apply instead. `harness stats` prints the same
+tables in the terminal.
 
 <Shot name="stats" />
 

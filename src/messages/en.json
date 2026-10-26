@@ -423,7 +423,7 @@
       "alt": "The Stats screen: totals, costs per stage and per task, verdicts and permission denials.",
       "caption": "Stats after the walkthrough. The tokens and costs are made up by the fake agent.",
       "markers": {
-        "tiles": "Totals: units, cost, tokens, agent time and denied tool calls.",
+        "tiles": "Totals: units, API-equivalent cost, tokens, agent time and denied tool calls. Cost is the price <code>claude -p</code> reports; a subscription login is not billed per token.",
         "unknown": "A unit whose agent printed no usage counts as unknown, not as zero.",
         "stage": "Per stage, with its coordinator, the parked count and a bar for cost.",
         "task": "Per task, with its current status.",
@@ -439,9 +439,19 @@
         "matrix": "The specialists each unit gets through <code>--agents</code>. A dot marks the stage that offers one.",
         "pill": "The checks that refuse a run, summed up.",
         "checks": "The checks: the judge's model differs from the implementer's and the tester's, and every agent carries the current standing rules.",
-        "invocation": "How a unit starts Claude Code. This orange card appears only because <code>AGENT_CMD</code> points at the fake agent; a real project shows the plain <code>claude</code> command.",
+        "invocation": "How a unit starts Claude Code. This orange card appears only because <code>AGENT_CMD</code> points at the fake agent; a real project shows the plain <code>claude</code> command. With a real <code>claude</code>, a Billing row also says how the run is billed.",
         "integrations": "Delivery and Telegram, both off here. Delivery needs <code>deliver.pr</code>; Telegram needs <code>TELEGRAM_BOT_TOKEN</code> and <code>TELEGRAM_CHAT_ID</code>.",
         "tools": "Permission mode, setting sources and allowed tools. Commits and pushes are absent on purpose: the loop commits only after the contracts pass."
+      }
+    },
+    "delivered": {
+      "alt": "The board with T-001 delivered and T-002 done, and the drawer of T-001 with its pull request link.",
+      "caption": "Delivery by pull request: T-001 is delivered, T-002 is next.",
+      "markers": {
+        "next": "T-002 is done. With <code>deliver.pr</code> on, the card says PR next, and the grey spinner shows the loop takes it next.",
+        "card": "T-001 is delivered. The card links to its pull request, PR #1.",
+        "link": "The drawer says it again: Pull request #1, merging is yours. This URL comes from the fake <code>gh</code>, not from a real repository.",
+        "track": "The stage track is lit to the end: <code>delivered</code> is the last status."
       }
     }
   }

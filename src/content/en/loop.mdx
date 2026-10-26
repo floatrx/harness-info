@@ -61,6 +61,17 @@ Before the first unit, the supervisor checks two things and refuses to start if 
 - **The base branch is clean.** It refuses a dirty tree it did not make, because the scope contract would blame your
   changes on the agent.
 
+Its first log line says how the run is billed, from the environment it starts in:
+
+| The line says                                                                                      | When                                      |
+| -------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `billing: subscription login — usage limits, not a per-token bill; costs shown are API-equivalent` | `claude` is logged in with a subscription |
+| `billing: ANTHROPIC_API_KEY is set — claude -p bills the API per token`                            | the environment has `ANTHROPIC_API_KEY`   |
+| `billing: a stand-in replaces claude — no tokens`                                                  | `AGENT_CMD` or `agent.command` is set     |
+
+On a subscription, the costs on the dashboard and in `harness stats` are what the same tokens would cost on the API.
+They are not a bill.
+
 ## Pause and resume
 
 ```bash
@@ -151,6 +162,8 @@ planned after the first version.
 ```bash
 harness status --project bookmarks
 harness status --project bookmarks --json   # the same, for scripts
+harness stats --project bookmarks           # units, time, tokens and API-equivalent cost per stage and task
+harness stats --project bookmarks --json    # the same, for scripts
 ```
 
 The dashboard's **Live** view shows more: the supervisor's state, the unit in flight, its agents with their role,

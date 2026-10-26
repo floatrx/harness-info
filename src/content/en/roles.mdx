@@ -96,16 +96,16 @@ that could write would need its own commit and a wider scope contract.
 The task file is split into sections, and every section has one owner. A role may write only its own section. The
 dashboard writes only what a human owns.
 
-| Section of the task file                    | Written by                                |
-| ------------------------------------------- | ----------------------------------------- |
-| `## Draft`                                  | you, in the dashboard                     |
-| `## Spec`                                   | writer                                    |
-| `## Questions` — the questions              | writer or planner                         |
-| `## Questions` — the answers                | you, through the picker on the card       |
-| `## Plan`, `## Acceptance criteria`         | planner                                   |
-| `## Prototype`                              | designer; you write the `### Review` part |
-| `title`, `kind`, `status` along human moves | you                                       |
-| `status` along agent moves, `## Log`        | the harness                               |
+| Section of the task file                    | Written by                                            |
+| ------------------------------------------- | ----------------------------------------------------- |
+| `## Draft`                                  | you, in the dashboard                                 |
+| `## Spec`                                   | writer                                                |
+| `## Questions` — the questions              | writer or planner                                     |
+| `## Questions` — the answers                | you, through the picker on the card                   |
+| `## Plan`, `## Acceptance criteria`         | planner; you write the `### Review` part of `## Plan` |
+| `## Prototype`                              | designer; you write the `### Review` part             |
+| `title`, `kind`, `status` along human moves | you                                                   |
+| `status` along agent moves, `## Log`        | the harness                                           |
 
 Owned sections are why two writers never fight over one file: when the harness and the dashboard both touch a task,
 each one edits only its own region. Code and tests are not in the task file at all; the scope contract guards them.

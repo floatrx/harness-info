@@ -1,24 +1,88 @@
 {
   "nodes": {
-    "draft": { "d": [20, 40, 110, 40], "m": [80, 20, 140, 40] },
-    "spec": { "d": [165, 40, 110, 40], "m": [80, 90, 140, 40] },
-    "needs-input": { "d": [237, 130, 110, 40], "m": [245, 125, 105, 40] },
-    "plan": { "d": [310, 40, 110, 40], "m": [80, 160, 140, 40] },
-    "planned": { "d": [455, 40, 110, 40], "m": [80, 230, 140, 40] },
-    "prototype": { "d": [600, 30, 150, 60], "m": [80, 300, 140, 60] },
-    "ready": { "d": [640, 230, 110, 40], "m": [80, 400, 140, 40] },
-    "implementing": { "d": [475, 230, 120, 40], "m": [80, 470, 140, 40] },
-    "qa": { "d": [330, 230, 110, 40], "m": [80, 540, 140, 40] },
-    "judge": { "d": [180, 230, 110, 40], "m": [80, 610, 140, 40] },
-    "done": { "d": [30, 230, 110, 40], "m": [80, 680, 140, 40] },
-    "delivered": { "d": [30, 370, 110, 40], "m": [80, 750, 140, 40] },
-    "parked": { "d": [330, 370, 110, 40], "m": [245, 575, 105, 40] }
+    "draft": {
+      "d": [20, 40, 110, 40],
+      "m": [80, 20, 140, 40]
+    },
+    "spec": {
+      "d": [165, 40, 110, 40],
+      "m": [80, 90, 140, 40]
+    },
+    "needs-input": {
+      "d": [237, 130, 110, 40],
+      "m": [245, 125, 105, 40]
+    },
+    "plan": {
+      "d": [310, 40, 110, 40],
+      "m": [80, 160, 140, 40]
+    },
+    "planned": {
+      "d": [455, 40, 110, 40],
+      "m": [80, 230, 140, 40]
+    },
+    "prototype": {
+      "d": [600, 30, 150, 60],
+      "m": [80, 300, 140, 60]
+    },
+    "ready": {
+      "d": [640, 230, 110, 40],
+      "m": [80, 400, 140, 40]
+    },
+    "implementing": {
+      "d": [475, 230, 120, 40],
+      "m": [80, 470, 140, 40]
+    },
+    "qa": {
+      "d": [330, 230, 110, 40],
+      "m": [80, 540, 140, 40]
+    },
+    "judge": {
+      "d": [180, 230, 110, 40],
+      "m": [80, 610, 140, 40]
+    },
+    "done": {
+      "d": [30, 230, 110, 40],
+      "m": [80, 680, 140, 40]
+    },
+    "delivered": {
+      "d": [30, 370, 110, 40],
+      "m": [80, 750, 140, 40]
+    },
+    "parked": {
+      "d": [330, 370, 110, 40],
+      "m": [245, 575, 105, 40]
+    }
   },
-  "box": { "d": [770, 430], "m": [360, 810] },
+  "box": {
+    "d": [770, 430],
+    "m": [360, 810]
+  },
   "edges": [
-    { "id": "submit", "action": "submit", "actor": "human", "from": "draft", "to": "spec" },
-    { "id": "spec-done", "action": "spec-done", "actor": "agent", "from": "spec", "to": "plan" },
-    { "id": "ask-spec", "action": "ask", "actor": "agent", "from": "spec", "to": "needs-input", "bend": { "d": 14, "m": 14 } },
+    {
+      "id": "submit",
+      "action": "submit",
+      "actor": "human",
+      "from": "draft",
+      "to": "spec"
+    },
+    {
+      "id": "spec-done",
+      "action": "spec-done",
+      "actor": "agent",
+      "from": "spec",
+      "to": "plan"
+    },
+    {
+      "id": "ask-spec",
+      "action": "ask",
+      "actor": "agent",
+      "from": "spec",
+      "to": "needs-input",
+      "bend": {
+        "d": 14,
+        "m": 14
+      }
+    },
     {
       "id": "answered-spec",
       "action": "answered",
@@ -26,10 +90,40 @@
       "from": "needs-input",
       "to": "spec",
       "guard": "noQuestions",
-      "bend": { "d": 14, "m": 14 }
+      "bend": {
+        "d": 14,
+        "m": 14
+      }
     },
-    { "id": "plan-done", "action": "plan-done", "actor": "agent", "from": "plan", "to": "planned" },
-    { "id": "ask-plan", "action": "ask", "actor": "agent", "from": "plan", "to": "needs-input", "bend": { "d": 14, "m": 14 } },
+    {
+      "id": "plan-done",
+      "action": "plan-done",
+      "actor": "agent",
+      "from": "plan",
+      "to": "planned"
+    },
+    {
+      "id": "revise",
+      "action": "revise",
+      "actor": "human",
+      "from": "planned",
+      "to": "plan",
+      "bend": {
+        "d": 22,
+        "m": 22
+      }
+    },
+    {
+      "id": "ask-plan",
+      "action": "ask",
+      "actor": "agent",
+      "from": "plan",
+      "to": "needs-input",
+      "bend": {
+        "d": 14,
+        "m": 14
+      }
+    },
     {
       "id": "answered-plan",
       "action": "answered",
@@ -37,7 +131,10 @@
       "from": "needs-input",
       "to": "plan",
       "guard": "noQuestions",
-      "bend": { "d": 14, "m": 14 }
+      "bend": {
+        "d": 14,
+        "m": 14
+      }
     },
     {
       "id": "approve-ui",
@@ -55,7 +152,10 @@
       "from": "planned",
       "to": "ready",
       "guard": "notUi",
-      "bend": { "d": -40, "m": -70 }
+      "bend": {
+        "d": -40,
+        "m": -70
+      }
     },
     {
       "id": "auto-approve-ui",
@@ -65,7 +165,10 @@
       "to": "prototype",
       "toPort": "drafting",
       "guard": "full",
-      "bend": { "d": 16, "m": 16 }
+      "bend": {
+        "d": 16,
+        "m": 16
+      }
     },
     {
       "id": "auto-approve",
@@ -74,7 +177,10 @@
       "from": "planned",
       "to": "ready",
       "guard": "full",
-      "bend": { "d": -70, "m": -95 }
+      "bend": {
+        "d": -70,
+        "m": -95
+      }
     },
     {
       "id": "prototype-done",
@@ -95,9 +201,20 @@
       "to": "prototype",
       "toPort": "drafting",
       "guard": "review",
-      "bend": { "d": 34, "m": 34 }
+      "bend": {
+        "d": 34,
+        "m": 34
+      }
     },
-    { "id": "accept", "action": "accept", "actor": "human", "from": "prototype", "fromPort": "review", "to": "ready", "guard": "review" },
+    {
+      "id": "accept",
+      "action": "accept",
+      "actor": "human",
+      "from": "prototype",
+      "fromPort": "review",
+      "to": "ready",
+      "guard": "review"
+    },
     {
       "id": "auto-accept",
       "action": "auto-accept",
@@ -106,11 +223,37 @@
       "fromPort": "review",
       "to": "ready",
       "guard": "full",
-      "bend": { "d": 22, "m": 22 }
+      "bend": {
+        "d": 22,
+        "m": 22
+      }
     },
-    { "id": "start", "action": "start", "actor": "agent", "from": "ready", "to": "implementing" },
-    { "id": "implemented", "action": "implemented", "actor": "agent", "from": "implementing", "to": "qa", "bend": { "d": 12, "m": 0 } },
-    { "id": "qa-pass", "action": "qa-pass", "actor": "agent", "from": "qa", "to": "judge", "guard": "notMerge" },
+    {
+      "id": "start",
+      "action": "start",
+      "actor": "agent",
+      "from": "ready",
+      "to": "implementing"
+    },
+    {
+      "id": "implemented",
+      "action": "implemented",
+      "actor": "agent",
+      "from": "implementing",
+      "to": "qa",
+      "bend": {
+        "d": 12,
+        "m": 0
+      }
+    },
+    {
+      "id": "qa-pass",
+      "action": "qa-pass",
+      "actor": "agent",
+      "from": "qa",
+      "to": "judge",
+      "guard": "notMerge"
+    },
     {
       "id": "qa-pass-merged",
       "action": "qa-pass",
@@ -118,7 +261,10 @@
       "from": "qa",
       "to": "done",
       "guard": "merge",
-      "bend": { "d": -50, "m": -55 }
+      "bend": {
+        "d": -50,
+        "m": -55
+      }
     },
     {
       "id": "qa-fail",
@@ -127,10 +273,26 @@
       "from": "qa",
       "to": "implementing",
       "guard": "underCap",
-      "bend": { "d": 12, "m": -30 }
+      "bend": {
+        "d": 12,
+        "m": -30
+      }
     },
-    { "id": "qa-fail-cap", "action": "qa-fail", "actor": "agent", "from": "qa", "to": "parked", "guard": "atCap" },
-    { "id": "confirmed", "action": "confirmed", "actor": "agent", "from": "judge", "to": "done" },
+    {
+      "id": "qa-fail-cap",
+      "action": "qa-fail",
+      "actor": "agent",
+      "from": "qa",
+      "to": "parked",
+      "guard": "atCap"
+    },
+    {
+      "id": "confirmed",
+      "action": "confirmed",
+      "actor": "agent",
+      "from": "judge",
+      "to": "done"
+    },
     {
       "id": "rejected",
       "action": "rejected",
@@ -138,7 +300,10 @@
       "from": "judge",
       "to": "implementing",
       "guard": "underCap",
-      "bend": { "d": 60, "m": -60 }
+      "bend": {
+        "d": 60,
+        "m": -60
+      }
     },
     {
       "id": "rejected-cap",
@@ -147,10 +312,27 @@
       "from": "judge",
       "to": "parked",
       "guard": "atCap",
-      "bend": { "d": 0, "m": -20 }
+      "bend": {
+        "d": 0,
+        "m": -20
+      }
     },
-    { "id": "delivered", "action": "delivered", "actor": "agent", "from": "done", "to": "delivered" }
+    {
+      "id": "delivered",
+      "action": "delivered",
+      "actor": "agent",
+      "from": "done",
+      "to": "delivered"
+    }
   ],
-  "park": { "action": "park", "actor": "agent", "except": ["draft", "parked", "delivered"] },
-  "reopen": { "action": "reopen", "actor": "human", "from": "parked" }
+  "park": {
+    "action": "park",
+    "actor": "agent",
+    "except": ["draft", "parked", "delivered"]
+  },
+  "reopen": {
+    "action": "reopen",
+    "actor": "human",
+    "from": "parked"
+  }
 }

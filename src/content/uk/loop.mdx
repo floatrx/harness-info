@@ -60,6 +60,17 @@ harness preview T-002 --project bookmarks    # the exact command and prompt of t
 - **Базова гілка чиста.** Він відмовляється працювати на брудному дереві, яке забруднив не він, бо контракт scope
   повісив би твої зміни на агента.
 
+Перший рядок його логу каже, як тарифікується запуск, — за оточенням, у якому він стартує:
+
+| Рядок                                                                                              | Коли                                   |
+| -------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `billing: subscription login — usage limits, not a per-token bill; costs shown are API-equivalent` | `claude` залогінений через підписку    |
+| `billing: ANTHROPIC_API_KEY is set — claude -p bills the API per token`                            | в оточенні є `ANTHROPIC_API_KEY`       |
+| `billing: a stand-in replaces claude — no tokens`                                                  | задано `AGENT_CMD` або `agent.command` |
+
+На підписці вартість у дашборді й у `harness stats` — це те, скільки ті самі токени коштували б через API. Це не
+рахунок.
+
 ## Пауза і відновлення
 
 ```bash
@@ -150,6 +161,8 @@ worktree на кожну задачу — це заплановано після
 ```bash
 harness status --project bookmarks
 harness status --project bookmarks --json   # the same, for scripts
+harness stats --project bookmarks           # units, time, tokens and API-equivalent cost per stage and task
+harness stats --project bookmarks --json    # the same, for scripts
 ```
 
 Вигляд **Live** у дашборді показує більше: стан supervisor, юніт у роботі, його агентів з роллю, часом і поточним
