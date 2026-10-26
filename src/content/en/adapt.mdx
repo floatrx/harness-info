@@ -60,17 +60,17 @@ Every other key keeps its default in code, so a changed default reaches every pr
 
 Keys you can add when you need them:
 
-| Key                    | Default                             | What it does                                                                                                               | More                      |
-| ---------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| `roles.models`         | coordinators `sonnet`, judge `opus` | the model per role; the judge must differ from the implementer and the tester                                              | [Roles](/roles)           |
-| `roles.mergeQaJudge`   | `false`                             | one review unit per task instead of two                                                                                    | [Roles](/roles)           |
-| `notify.events`        | all seven                           | which Telegram events to send                                                                                              | [Running the loop](/loop) |
-| `agent.command`        | `null`                              | a command that replaces `claude`, like `AGENT_CMD`                                                                         |                           |
-| `agent.permissionMode` | `dontAsk`                           | `claude --permission-mode`: refuse what is not allowed instead of waiting                                                  |                           |
-| `agent.allowedTools`   | a list                              | `claude --allowedTools`; read-only `grep`, `cat`, `head`, `tail` and `wc` are in, commits and pushes are absent on purpose |                           |
-| `agent.settingSources` | `project,local`                     | `claude --setting-sources`: your personal hooks never fire inside the loop                                                 |                           |
-| `supervisor.*`         | in code                             | poll and wait intervals, and `barrenUnits: 3`                                                                              | [Running the loop](/loop) |
-| `app`                  | `null`                              | start the project's app, and a browser, for the qa and prototype units, described below                                    |                           |
+| Key                    | Default                             | What it does                                                                                                                             | More                      |
+| ---------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `roles.models`         | coordinators `sonnet`, judge `opus` | the model per role; the judge must differ from the implementer and the tester                                                            | [Roles](/roles)           |
+| `roles.mergeQaJudge`   | `false`                             | one review unit per task instead of two                                                                                                  | [Roles](/roles)           |
+| `notify.events`        | all seven                           | which Telegram events to send                                                                                                            | [Running the loop](/loop) |
+| `agent.command`        | `null`                              | a command that replaces `claude`, like `AGENT_CMD`                                                                                       |                           |
+| `agent.permissionMode` | `dontAsk`                           | `claude --permission-mode`: refuse what is not allowed instead of waiting                                                                |                           |
+| `agent.allowedTools`   | a list                              | `claude --allowedTools`; read-only `grep`, `cat`, `head`, `tail` and `wc`, and `sleep`, are in; commits and pushes are absent on purpose |                           |
+| `agent.settingSources` | `project,local`                     | `claude --setting-sources`: your personal hooks never fire inside the loop                                                               |                           |
+| `supervisor.*`         | in code                             | poll and wait intervals, and `barrenUnits: 3`                                                                                            | [Running the loop](/loop) |
+| `app`                  | `null`                              | start the project's app, and a browser, for the qa and prototype units, described below                                                  |                           |
 
 ## Your app for qa and prototype units
 
@@ -80,13 +80,17 @@ Set `app` when a unit should see your project running. The runner starts the app
 "app": { "start": "pnpm exec next dev -p {port}" }
 ```
 
-| Key                  | Default                    | What it does                                                                     |
-| -------------------- | -------------------------- | -------------------------------------------------------------------------------- |
-| `app.start`          | required                   | the command that starts the app; without `{port}` the config is refused (exit 2) |
-| `app.ready`          | `"/"`                      | the path the runner polls until the app answers                                  |
-| `app.timeoutSeconds` | `60`                       | how long the runner waits for that answer                                        |
-| `app.stages`         | `["qa", "prototype"]`      | the unit stages that get the app and the browser                                 |
-| `app.browser`        | `"@playwright/mcp@0.0.83"` | the Playwright MCP package the browser runs through `npx`, pinned                |
+| Key                  | Default                    | What it does                                                                                                                                       |
+| -------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app.start`          | required                   | the command that starts the app; without `{port}` the config is refused (exit 2)                                                                   |
+| `app.ready`          | `"/"`                      | the path the runner polls until the app answers                                                                                                    |
+| `app.timeoutSeconds` | `60`                       | how long the runner waits for that answer                                                                                                          |
+| `app.host`           | `"localhost"`              | the host in the address the units get; Next 16's dev server serves its live-reload socket only on localhost, so a page on 127.0.0.1 never hydrates |
+| `app.stages`         | `["qa", "prototype"]`      | the unit stages that get the app and the browser                                                                                                   |
+| `app.browser`        | `"@playwright/mcp@0.0.83"` | the Playwright MCP package the browser runs through `npx`, pinned                                                                                  |
+
+The example project sets `"app": { "start": "pnpm exec next dev -p {port}", "ready": "/" }`, so its qa and prototype units
+get the app at `http://localhost:<port>`.
 
 Before each unit of those stages, the runner picks a free port, starts the command in its own process group and waits
 for the app. The unit gets the address in `HARNESS_APP_URL` and as a line in `## This run`, which also tells the agent
@@ -106,6 +110,9 @@ unit gets no MCP server at all. The runner writes `.harness/trace/unit-NNNN.mcp.
 server, and sets `HARNESS_MCP_CONFIG`. The server runs as `npx -y <app.browser> --headless --isolated --browser chrome`,
 so `npx` must be on `PATH`: `harness agents --check` warns when it is not, and its exit code stays the same.
 `harness preview` shows these flags for an app stage.
+
+The stage's coordinator passes the app's address to its specialist, because a specialist sees only its dispatch
+prompt. A specialist that lists its tools gets `mcp__playwright` in the `--agents` JSON; the judge never does.
 
 Playwright MCP saves a named screenshot in the project root, not in the artifacts folder. After a browser unit, the
 runner moves new untracked png, jpg and webp files from the project root into `.harness/artifacts/T-NNN/` and notes

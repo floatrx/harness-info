@@ -407,7 +407,7 @@
         "tab": "The Prototype tab appears for UI tasks.",
         "accept": "Accept moves the task to <code>ready</code>.",
         "comment": "Or write what the next round should change. The drawer shows how many rounds are left.",
-        "preview": "The round's picture from the task's artifacts folder. Without a browser, which a unit gets only when the project sets <code>app</code>, the designer usually draws <code>prototype.svg</code>, a 1440 px wireframe with the page's real copy, layout and colours; <code>prototype.png</code> appears when an allowed command can take a screenshot. Here the fake agent drew it.",
+        "preview": "The round's picture from the task's artifacts folder. With an app, the designer screenshots the running route as <code>prototype.png</code> at 1440×900; without one it draws <code>prototype.svg</code>, a 1440 px wireframe with the page's real copy, layout and colours. Here the fake agent drew it.",
         "draft": "Your draft, to compare the picture with what you asked for."
       }
     },

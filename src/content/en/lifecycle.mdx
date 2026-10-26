@@ -13,7 +13,7 @@ status, one column, one owner. A card shows a "working" badge while a unit is wo
 | `prototype`       | designer, then you  | The designer builds a prototype; you accept it or comment.                                                                       | `ready` · another round                                       |
 | `ready`           | approved, waiting   | Nothing runs yet.                                                                                                                | `implementing` when the implement unit starts                 |
 | `implementing`    | tester, implementer | The tester writes the tests, the implementer the code; the harness commits after a green gate.                                   | `qa` · `parked`                                               |
-| `qa`              | qa                  | Runs every `[closes]` command and the gate, and checks the criteria it can check.                                                | `judge` · `implementing` · `parked`                           |
+| `qa`              | qa                  | Runs every `[closes]` command and the gate; with an app, walks each `[found]` criterion in the browser.                          | `judge` · `implementing` · `parked`                           |
 | `judge`           | judge               | Re-runs every closing check and tries to reject.                                                                                 | `done` · `implementing`                                       |
 | `done`            | runner              | With `deliver.pr` on, the runner pushes the branch and opens the PR, with no agent and no tokens. Without it, `done` is the end. | `delivered` with `deliver.pr`, otherwise none                 |
 | `delivered`       | —                   | The branch is pushed and the PR is open.                                                                                         | end: a human merges                                           |
@@ -87,10 +87,10 @@ names such tasks in its out-of-scope list instead.
 ## The prototype step
 
 Tasks with `kind: ui` get one more stage before code. The designer builds a prototype as a route in the app and leaves a
-picture of it in the task's artifacts folder. A unit has a browser only when the project sets [`app`](/adapt#your-app-for-qa-and-prototype-units) and the app started. Without one, when no
-allowed command can take a screenshot,
-it draws `prototype.svg`: a 1440 px wide wireframe with the page's real copy, layout and colours, one column per state,
-nothing overlapping. A screenshot saves as `prototype.png`. The designer never starts a server it cannot stop. The dashboard shows the picture on the card and in the drawer; a round that
+picture of it in the task's artifacts folder. With an app (the project sets [`app`](/adapt#your-app-for-qa-and-prototype-units) and it started), the designer opens the route in the browser and
+takes a 1440×900 `prototype.png`, plus `prototype-2.png` and on for more states. Without one, it draws
+`prototype.svg`: a 1440 px wide wireframe with the page's real copy, layout and colours, one column per state,
+nothing overlapping. The designer never starts or stops a server: the runner owns the app. The dashboard shows the picture on the card and in the drawer; a round that
 leaves none gets a note in `## Log`, and you can still review the route. The card stops in `prototype` and waits for
 you:
 
@@ -132,7 +132,9 @@ step. The runner does it itself: no agent, no tokens
 1. It checks the branch contract: the task branch exists, it is ahead of the base branch, and every commit subject
    starts with `T-NNN:`.
 2. It writes the pull request body to `.harness/artifacts/T-NNN/pr-body.md`: the goal from the spec, the plan, each
-   acceptance criterion with a ✓ and its command for `[closes]`, the qa and judge verdicts with their unit numbers, and
+   acceptance criterion with a ✓ and its command for `[closes]`, a ✓ and its screenshot for a `[found]` criterion qa
+   walked in the browser (the others stay unchecked, for a human), a line that says how many qa walked, the qa and
+   judge verdicts with their unit numbers, and
    the commits.
 3. It pushes the branch with `git push -u <remote> <branch>`.
 4. It opens the pull request with `gh pr create`. It asks `gh pr view <branch>` first, so a retry never opens a second
@@ -153,7 +155,9 @@ way `AGENT_CMD` replaces the agent; the self-tests use it.
   code, not Claude. [#2](https://github.com/floatrx/harness-demo-bookmarks/pull/2) followed a real-Claude run of T-004: 13 units, where a
   clean run takes 5; the 8 extra units are the lessons the pilot fixed. [#3](https://github.com/floatrx/harness-demo-bookmarks/pull/3) is
   T-001, a UI task, in a clean real-Claude run of 7 units, and [#4](https://github.com/floatrx/harness-demo-bookmarks/pull/4) is T-003,
-  where the judge rejected the first round. All of them stay open, because merging is yours.
+  where the judge rejected the first round. [#5](https://github.com/floatrx/harness-demo-bookmarks/pull/5) is T-005, a UI task, the first
+  one run with the example's app and a browser. Its body predates the format that marks walked criteria, so every `[found]` line there still
+  reads "for a human to check". All of them stay open, because merging is yours.
 </Note>
 
 <Shot name="delivered" plain />

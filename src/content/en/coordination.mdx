@@ -110,8 +110,8 @@ A fresh context remembers nothing, so the runner writes a short memory into ever
    stat of its branch;
 2. **the tail of the task's `## Log`**;
 3. **the tail of `JOURNAL.md`** — the notes earlier units left for later ones;
-4. **the other tasks on the board** — id, status and title, for spec and plan units only, so a spec never recommends
-   what another task already does.
+4. **the other tasks on the board** — id, status and title, for spec and plan units only, so a spec never recommends what another task already does. A task with a branch also says whether it is
+   merged into the base branch or not yet, so a plan never builds on work that is not there.
 
 Facts come first because a journal entry is one agent's opinion, and a status in a file is not. No hook is involved and
 nothing is written into the project's settings: the runner builds the section itself, so `harness preview` shows it too.

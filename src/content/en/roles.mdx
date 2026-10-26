@@ -41,10 +41,10 @@ Each card says what the role reads, what it writes, and which verdict token code
 <Role
   id="designer"
   input="the plan of a ui task"
-  output="## Prototype — a prototype route and its picture: prototype.svg, or prototype.png when a screenshot is possible"
+  output="## Prototype — a prototype route and its picture: prototype.png from the running route with an app, prototype.svg without"
 >
-  Runs only for tasks with `kind: ui`. It builds a clickable prototype and stops. You accept it or leave a comment, and it goes another
-  round.
+  Runs only for tasks with `kind: ui`. It builds a clickable prototype and stops. With an app it screenshots the route at 1440×900; without
+  one it draws a wireframe. You accept it or leave a comment, and it goes another round.
 </Role>
 
 <Role id="tester" input="the plan and its [closes] criteria" output="tests in the project's own stack, inside the scope">
@@ -65,12 +65,13 @@ Each card says what the role reads, what it writes, and which verdict token code
 <Role
   id="qa"
   input="the commit and the acceptance criteria"
-  output="a report under .harness/artifacts/, with a For the reviewer list"
+  output="qa-report.md under .harness/artifacts/: a line per criterion, its screenshots, a For the reviewer list"
   verdict="qa: PASS | FAIL | CANNOT_VERIFY"
 >
-  Runs every `[closes]` command and the gate, and checks each `[found]` criterion it can check here. It is read-only: it never writes tests
-  and never fixes code. PASS when they all hold, FAIL when a checked criterion does not. "Cannot verify" only when a `[closes]` command or
-  the gate cannot run, and it parks the task for a human. A `[found]` criterion that needs a person goes to the reviewer list instead.
+  Runs every `[closes]` command and the gate. With an app, it walks each `[found]` criterion in the browser and saves a screenshot per
+  criterion; without one, it checks what commands and code can show. It is read-only: it never writes tests and never fixes code. PASS when
+  they all hold, FAIL when a checked or walked criterion does not. "Cannot verify" only when a `[closes]` command or the gate cannot run,
+  and it parks the task for a human. A step a browser cannot do goes to the reviewer list instead.
 </Role>
 
 <Role
@@ -80,7 +81,8 @@ Each card says what the role reads, what it writes, and which verdict token code
   verdict="judge: CONFIRMED | REJECTED"
 >
   Adversarial and read-only. It re-runs every closing check itself and looks for reasons the work is not done. It judges `[found]` criteria
-  from the code and never rejects only because nobody walked them. A task can only close with a `CONFIRMED` judge.
+  from the code and never rejects only because nobody walked them. It never gets the browser. A task can only close with a `CONFIRMED`
+  judge.
 </Role>
 
 ## Why the test author is not qa

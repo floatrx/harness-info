@@ -102,11 +102,19 @@ Every criterion is tagged:
 
 - **`[closes]`** — a shell command, written after a colon. The runner runs it; exit code 0 means the criterion is
   met. Only these decide whether the task closes.
-- **`[found]`** — something a reviewer checks and reports, such as behaviour in the running app. A unit has a
-  browser only when the project sets [`app`](/adapt#your-app-for-qa-and-prototype-units) and the app started. Without one, qa never fails or parks a task over a `[found]` criterion that needs a person: it copies it word for word
-  into a **For the reviewer** list in `.harness/artifacts/T-NNN/qa-report.md`. The pull request lists it unchecked,
-  for a human, and the judge judges it from the code.
+- **`[found]`** — something checked on the running app, such as behaviour on a page. With a browser (the project sets
+  [`app`](/adapt#your-app-for-qa-and-prototype-units) and the app started), qa walks each `[found]` criterion: it does the steps, reads the console and
+  saves one screenshot per criterion in the artifacts folder. A criterion that does not hold is a FAIL, with its
+  screenshot. Without a browser, and for a step a browser cannot do (time passing, another device, an e-mail, a second
+  account), qa checks what a command, a test or the code can show and copies the rest word for word into a
+  **For the reviewer** list in `.harness/artifacts/T-NNN/qa-report.md`. That list is never a reason to fail or park. The
+  pull request marks a criterion qa walked with ✓ and its screenshot and lists the rest unchecked, for a human. The
+  judge judges `[found]` criteria from the code.
 - **`[process]`** — something a human does, such as a design review.
+
+`qa-report.md` starts with one line per criterion in a fixed form, because the pull request is built from those lines:
+`- <n> PASS|FAIL|REVIEWER · browser|command|code · <screenshot file, or ->`, for example
+`- 7 PASS · browser · qa-7-toast.png`.
 
 Continuing the T-002 illustration:
 
@@ -161,6 +169,9 @@ The runner creates the task's artifacts folder before the unit starts. The allow
 rule also says: run git from the folder you start in (`git diff main...HEAD`), never `git -C <path>`, and change files
 with the Write and Edit tools, never `tee`, `echo >` or `cat >`. A real run found it: qa and the judge both asked for
 `git -C <path> diff` and were refused.
+
+Rule 7 says to hold the turn until every specialist reports. To wait, an agent runs `sleep 20` as its own Bash
+call and then reads the report, never a shell loop (`until`, `while`); the default allowlist has `sleep` for that.
 
 ## Model split
 
