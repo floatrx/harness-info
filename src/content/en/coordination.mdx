@@ -28,8 +28,8 @@ The runner builds every coordinator's prompt from five parts, in this order:
 2. **the standing rules** — the rules every agent needs, such as never killing processes by pattern;
 3. **the specialists of this stage** — each one's name, when to call it, and its description;
 4. **`## Memory`** — measured facts and notes from earlier units, described [below](#memory-between-units);
-5. **`## This run`** — the facts of this unit: task, file, stage, branch, base, scope, gate, artifacts folder, bounces
-   the verdict line the stage requires, and the task-file sections this stage may write. Anything else goes inside
+5. **`## This run`** — the facts of this unit: task, file, stage, branch, base, scope, gate, artifacts folder, bounces,
+   the app's address when the runner started one, the verdict line the stage requires, and the task-file sections this stage may write. Anything else goes inside
    those sections as `###` subsections; any other `##` heading stops the unit.
 
 ### How the coordinator is started

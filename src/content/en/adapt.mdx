@@ -70,6 +70,32 @@ Keys you can add when you need them:
 | `agent.allowedTools`   | a list                              | `claude --allowedTools`; read-only `grep`, `cat`, `head`, `tail` and `wc` are in, commits and pushes are absent on purpose |                           |
 | `agent.settingSources` | `project,local`                     | `claude --setting-sources`: your personal hooks never fire inside the loop                                                 |                           |
 | `supervisor.*`         | in code                             | poll and wait intervals, and `barrenUnits: 3`                                                                              | [Running the loop](/loop) |
+| `app`                  | `null`                              | start the project's app for the qa and prototype units, described below                                                    |                           |
+
+## Your app for qa and prototype units
+
+Set `app` when a unit should see your project running. The runner starts the app, never the agent:
+
+```json
+"app": { "start": "pnpm exec next dev -p {port}" }
+```
+
+| Key                  | Default               | What it does                                                                     |
+| -------------------- | --------------------- | -------------------------------------------------------------------------------- |
+| `app.start`          | required              | the command that starts the app; without `{port}` the config is refused (exit 2) |
+| `app.ready`          | `"/"`                 | the path the runner polls until the app answers                                  |
+| `app.timeoutSeconds` | `60`                  | how long the runner waits for that answer                                        |
+| `app.stages`         | `["qa", "prototype"]` | the unit stages that get the app                                                 |
+
+Before each unit of those stages, the runner picks a free port, starts the command in its own process group and waits
+for the app. The unit gets the address in `HARNESS_APP_URL` and as a line in `## This run`, which also tells the agent
+not to start or stop a server. After the unit, whatever its outcome, the runner stops exactly that process group. If
+the app does not start, the task's Log says why and the unit runs without it. A run also stops an app whose runner
+died, and logs it.
+
+The runner starts the app before it records the tree for the scope contract, so files the server writes at start are
+not the unit's. It also removes the AI-agent markers from the app's environment: Next.js 16.4 writes `AGENTS.md` into
+a project when it detects an agent, and that stray file would park a read-only unit.
 
 ## Your own specialist
 
