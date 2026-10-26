@@ -87,7 +87,7 @@
   },
   "home": {
     "title": "A harness runs Claude Code unattended",
-    "lead": "A harness is a small program around Claude Code. It gives the agent one unit of work at a time, checks the result with code instead of taking the agent's word, and keeps all its state in files. A run can go for hours, and you can pause it at any moment.",
+    "lead": "A harness is a small program around Claude Code. It gives the agent one unit of work at a time, checks the result with code instead of taking the agent's word, and keeps all its state in files. A run can go for hours, and you can pause it at any time: it stops after the unit in flight.",
     "primary": "Start with the concepts",
     "secondary": "Try it in 5 minutes",
     "flowTitle": "One task, thirteen columns",

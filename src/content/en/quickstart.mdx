@@ -62,14 +62,19 @@ In a second terminal, in the harness-demo folder, start the dashboard with the f
 AGENT_CMD="node $PWD/harness/testkit/fake-agent.ts" pnpm dashboard
 ```
 
+Right after Next's `Ready` line, the terminal names the agent that **Start** runs:
+
+```text
+harness · Start runs a stand-in for claude (AGENT_CMD: node …/fake-agent.ts) — no tokens
+```
+
 Open `http://127.0.0.1:4777` and pick harness-bookmarks. The line above the board says "3 drafts are yours — Submit
 starts the loop on each." The board updates by itself while the loop runs. The [Dashboard](/dashboard) chapter walks
 through every screen.
 
 <Note title="Start uses the dashboard's environment">
-  The **Start** button runs `harness run` with the environment the dashboard started in. With `AGENT_CMD` set, every unit it runs is the
-  fake agent. Without it, Start runs real Claude units. To check before you press Start, open the project's Agents page: the Invocation card
-  says "A stand-in replaces `claude`" when the fake agent is on.
+  The **Start** button runs `harness run` with the environment the dashboard started in, and its label says who that is. Here it reads
+  **Start · stand-in**: every unit is the fake agent. Without `AGENT_CMD` it reads **Start · claude**, and every unit spends real usage.
 </Note>
 
 ## The first task, with zero tokens
@@ -77,7 +82,7 @@ through every screen.
 The fake agent plays every role from a script. It spends nothing, so you can watch a whole task move before you pay for
 one.
 
-Pick one way: the dashboard or the CLI. On the dashboard, press **Submit** on T-002, press **Start**, press **Approve**
+Pick one way: the dashboard or the CLI. On the dashboard, press **Submit** on T-002, press **Start · stand-in**, press **Approve**
 when the plan waits for you, and watch the card go through implement, qa and judge to done. With the CLI, step by step:
 
 1. Point the harness at the fake agent, and submit T-002:
@@ -185,7 +190,7 @@ harness run --project harness-bookmarks --once-through
 
 The run stops each time a column is yours: questions in `needs-input`, the plan in `planned`, and, because T-001 is a
 UI task, the prototype in `prototype`. Answer, approve or accept, on the dashboard or with the CLI, then run again. To
-drive it from the dashboard, restart the dashboard without `AGENT_CMD` first.
+drive it from the dashboard, restart the dashboard without `AGENT_CMD` first; its button then reads **Start · claude**.
 
 `harness stats --project harness-bookmarks` then prints the units, time, tokens and API-equivalent cost per stage and
 per task.

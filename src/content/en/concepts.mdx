@@ -16,16 +16,16 @@ strength in one direction and keeps it from running off the road.
 
 Every other page uses these words in exactly this sense.
 
-| Word            | Meaning                                                                                                                    | Where you see it                 |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
-| **task**        | One thing you want done: a Markdown file with a status in its frontmatter.                                                 | `.harness/tasks/T-007.md`        |
-| **unit**        | One fresh agent run that moves one task one step forward.                                                                  | one `claude -p` process          |
-| **corpus**      | The folder of all task files. The queue is computed from it.                                                               | `.harness/tasks/`                |
-| **coordinator** | The agent a unit starts. It reads the task, calls specialists and collects their answers.                                  | the prompt for the current stage |
-| **specialist**  | An agent with one job, defined in one file: writer, explorer, planner, designer, tester, implementer, debugger, qa, judge. | `agents/*.md`                    |
-| **verdict**     | A fixed token a specialist must leave behind, so code can read the outcome.                                                | `qa: PASS`, `judge: CONFIRMED`   |
-| **contract**    | A rule checked by code after the unit, not by the agent during it.                                                         | scope, gate, trace, closing      |
-| **gate**        | The command that must pass before work counts: types, lint, tests.                                                         | `gate:` in the task file         |
+| Word            | Meaning                                                                                                                    | Where you see it                       |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| **task**        | One thing you want done: a Markdown file with a status in its frontmatter.                                                 | `.harness/tasks/T-007.md`              |
+| **unit**        | One fresh agent run that moves one task one step forward.                                                                  | one `claude -p` process                |
+| **corpus**      | The folder of all task files. The queue is computed from it.                                                               | `.harness/tasks/`                      |
+| **coordinator** | The agent a unit starts. It reads the task, calls specialists and collects their answers.                                  | the prompt for the current stage       |
+| **specialist**  | An agent with one job, defined in one file: writer, explorer, planner, designer, tester, implementer, debugger, qa, judge. | `agents/*.md`                          |
+| **verdict**     | A fixed token a specialist must leave behind, so code can read the outcome.                                                | `qa: PASS`, `judge: CONFIRMED`         |
+| **contract**    | A rule checked by code after the unit, not by the agent during it.                                                         | scope, task file, trace, gate, closing |
+| **gate**        | The command that must pass before work counts: types, lint, tests.                                                         | `gate:` in the task file               |
 
 ## Four ideas that make it work
 

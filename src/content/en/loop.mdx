@@ -13,7 +13,7 @@ The loop is two programs inside each other. The supervisor runs for hours; the r
 | runner      | one unit          | picks a task, takes a snapshot, starts the coordinator, checks the contracts, records the result, exits with a code     |
 | coordinator | one unit          | the `claude -p` process: reads the task and calls specialists                                                           |
 | specialists | part of a unit    | do one narrow job each and leave a verdict                                                                              |
-| contracts   | the end of a unit | scope, gate, trace, closing: code that decides whether the unit counts                                                  |
+| contracts   | the end of a unit | scope, task file, trace, gate, closing: code that decides whether the unit counts                                       |
 
 Step through five runs to see which layer is busy, what the trace folder holds, and how pause, stop, a hard stop
 and a usage limit play out.
@@ -26,10 +26,11 @@ project, created and registered with `harness example ~/code/bookmarks`; the pro
 
 ## Start
 
-From the dashboard, press **Start**. It spawns `harness run --project <path>` as a detached process, with its output
+From the dashboard, press **Start**. It spawns `harness run --project <path>` as a detached process, with the dashboard's own environment and its output
 in `.harness/trace/supervisor.out`. The dashboard's **Pause**, **Resume** and **Stop** write the same files as the CLI;
 the dashboard never signals or kills a process. Its dock shows the supervisor as Running, Paused, Stopping (STOP is
-written, the unit is finishing) or Not running.
+written, the unit is finishing) or Not running. The button names who a Start runs: **Start · claude**, or **Start · stand-in** when `AGENT_CMD` or
+`agent.command` is set; the dashboard's first line in the terminal says the same.
 
 From a terminal:
 
@@ -110,28 +111,29 @@ far more than you think, including other Claude sessions.
 
 Every unit ends with an exit code from the runner. The supervisor reads it and decides what to do next.
 
-| Runner code | Meaning                                                                                                   | What happens next                                                                     |
-| ----------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `0`         | the unit is done                                                                                          | the supervisor takes the next unit                                                    |
-| `1`         | a hard stop: scope, task file, trace, gate, or the agent crashed                                          | the unit's work goes into a named stash, the task is parked, the supervisor continues |
-| `2`         | the configuration is broken: `config.json`, drifted standing rules, or a judge on the implementer's model | the supervisor stops: waiting will not fix it                                         |
-| `3`         | nothing is left to take                                                                                   | the supervisor polls for new work; with `--once-through` it ends the run              |
-| `4`         | the agent could not run: usage limit, network, login                                                      | the supervisor waits, then retries                                                    |
+| Runner code | Meaning                                                                                                                   | What happens next                                                                     |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `0`         | the unit is done                                                                                                          | the supervisor takes the next unit                                                    |
+| `1`         | a hard stop: scope, task file, trace, gate, or the agent crashed                                                          | the unit's work goes into a named stash, the task is parked, the supervisor continues |
+| `2`         | the configuration is broken: `config.json`, drifted standing rules, or a judge on the implementer's or the tester's model | the supervisor stops: waiting will not fix it                                         |
+| `3`         | nothing is left to take                                                                                                   | the supervisor polls for new work; with `--once-through` it ends the run              |
+| `4`         | the agent could not run: usage limit, network, login                                                                      | the supervisor waits, then retries                                                    |
 
 A hard stop throws nothing away. The runner moves the unit's changes into a `git stash` named
 `harness quarantine: T-NNN unit N`, restores the tree, and writes the reason into the task. You can inspect the stash
 before you reopen the task.
 
-The supervisor has its own exit codes, for when the whole run ends:
+The supervisor has its own exit codes, for when the whole run ends. The numbers repeat, but the meanings differ:
+runner code 3 is an empty queue, and supervisor code 3 is a stuck loop.
 
 | Supervisor code | Why the run ended                                                                                                            |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `0`             | it was stopped, the queue drained under `--once-through`, or the deadline or `--max-units` was reached                       |
 | `2`             | the configuration is broken, or `deliver.pr` is on and a remote, `gh`, its login or the base branch on the remote is missing |
-| `3`             | barren: three batches in a row moved nothing                                                                                 |
+| `3`             | barren: three units in a row moved nothing                                                                                   |
 | `4`             | it gave up waiting for the agent                                                                                             |
 
-The barren rule keeps a stuck loop from spinning: **three batches in a row that moved nothing stop it.** Progress means
+The barren rule keeps a stuck loop from spinning: **three units in a row that moved nothing stop it.** Progress means
 new commits **or** new handoffs, not just one of them.
 
 ## Usage limits and outages
