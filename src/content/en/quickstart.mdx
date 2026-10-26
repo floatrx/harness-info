@@ -1,0 +1,172 @@
+## What you need
+
+| Tool                              | Why                                                                          |
+| --------------------------------- | ---------------------------------------------------------------------------- |
+| Node 26 or newer                  | harness-demo is TypeScript that Node runs directly, with no build step       |
+| pnpm                              | installs harness-demo and the example app                                    |
+| git                               | every project is a git repository, and the loop works on branches            |
+| Claude Code (`claude`), logged in | only for real units, at the end of this page                                 |
+| GitHub CLI (`gh`), logged in      | only for delivery by pull request, described on [Task lifecycle](/lifecycle) |
+
+## Get harness-demo
+
+```bash
+git clone https://github.com/floatrx/harness-demo
+cd harness-demo
+pnpm install
+alias harness="node $PWD/harness/bin/harness.ts"
+harness self-test
+```
+
+`self-test` runs every contract case on a throwaway git repository with the fake agent, so it spends no tokens. It
+takes about ten seconds and ends with:
+
+```text
+29/29 cases passed
+```
+
+The alias lasts for this shell. Run the commands below from the harness-demo folder.
+
+## Make the example project
+
+```bash
+harness example ~/harness-bookmarks
+```
+
+```text
+copied examples/app → ~/harness-bookmarks
+pnpm install …
+initial commit on main
+registered a79751 · harness-bookmarks
+
+next:
+  harness submit T-002 --project harness-bookmarks
+  harness run --project harness-bookmarks --once-through
+```
+
+`harness example` copies the small bookmarks app from `examples/app` into its own git repository, installs it, makes
+the first commit and registers it as `harness-bookmarks`. The loop creates branches and commits there, never inside
+harness-demo. The id differs on your machine, and the paths here are shortened. Three seed tasks wait as drafts:
+
+| Seed task                                         | What it exercises             |
+| ------------------------------------------------- | ----------------------------- |
+| T-001 · Search box that filters the bookmark list | a UI task: the prototype step |
+| T-002 · Do not add the same URL twice             | a logic task with a test      |
+| T-003 · Make the bookmarks better                 | a vague draft: the interview  |
+
+## Open the dashboard
+
+In a second terminal, in the harness-demo folder:
+
+```bash
+pnpm dashboard
+```
+
+Open `http://127.0.0.1:4777` and pick harness-bookmarks. The board updates by itself while the loop runs. The
+[Dashboard](/dashboard) chapter walks through every screen.
+
+## The first task, with zero tokens
+
+The fake agent plays every role from a script. It spends nothing, so you can watch a whole task move before you pay for
+one.
+
+1. Point the harness at the fake agent, and submit T-002:
+
+   ```bash
+   export AGENT_CMD="node $PWD/harness/testkit/fake-agent.ts"
+   harness submit T-002 --project harness-bookmarks
+   ```
+
+   The card moves from `draft` to `spec`.
+
+2. Run the loop until it needs you:
+
+   ```bash
+   harness run --project harness-bookmarks --once-through
+   ```
+
+   ```text
+   supervisor · start · pid 33112 · once-through
+   unit 1 · T-002 · spec · writer · start
+   unit 1 · T-002 · spec · exit 0 · spec → plan
+   unit 2 · T-002 · plan · planner · start
+   unit 2 · T-002 · plan · exit 0 · plan → planned
+   supervisor · exit 0 · drained: nothing left to take
+   ```
+
+   The writer wrote the spec, and the planner wrote the plan. The card stops in `planned`: with the default
+   `autonomy.mode: gated`, a plan waits for your approval.
+
+3. Approve the plan, then run again:
+
+   ```bash
+   harness approve T-002 --project harness-bookmarks
+   harness run --project harness-bookmarks --once-through
+   ```
+
+   ```text
+   supervisor · start · pid 33194 · once-through
+   unit 3 · T-002 · implement · implementer · start
+   unit 3 · T-002 · implement · exit 0 · implementing → qa · commit 864e9c9
+   unit 4 · T-002 · qa · qa · start
+   unit 4 · T-002 · qa · exit 0 · qa → judge
+   unit 5 · T-002 · judge · judge · start
+   unit 5 · T-002 · judge · exit 0 · judge → done
+   supervisor · exit 0 · drained: nothing left to take
+   ```
+
+4. Check the result:
+
+   ```bash
+   harness status --project harness-bookmarks
+   git -C ~/harness-bookmarks log --oneline --all
+   ```
+
+   ```text
+   supervisor: not running
+   T-001  draft        Search box that filters the bookmark list
+   T-002  done         Do not add the same URL twice
+   T-003  draft        Make the bookmarks better
+
+   864e9c9 T-002: Do not add the same URL twice (round 1)
+   8f692c4 chore: example app from harness-demo
+   ```
+
+   The harness made one commit on the task branch, after the gate passed. Nothing else changed.
+
+<Note title="Why every unit took a second">
+  The fake agent answers at once. A real unit runs Claude Code: in the smoke run, a real interview unit took 27 seconds and cost $0.106, and
+  an implement unit takes longer.
+</Note>
+
+## Switch to real Claude
+
+Drop the fake agent. First look at what a real unit would receive. Neither command below spends a token:
+
+```bash
+unset AGENT_CMD
+harness submit T-001 --project harness-bookmarks
+harness preview T-001 --project harness-bookmarks
+harness agents --check --project harness-bookmarks
+```
+
+`preview` prints the exact `claude` command line and the full prompt of the next unit:
+
+```text
+# T-001 · stage spec · coordinator writer
+# specialists: writer
+# argv: claude "-p" "--output-format" "stream-json" "--verbose" "--model" "sonnet" "--permission-mode" "dontAsk" …
+# prompt (3762 chars) — sent on stdin:
+
+# Stage: spec — coordinator
+…
+```
+
+`agents --check` lists the nine agents with their models and stages, and ends with `ok: no drift, no model clash`.
+When both look right, run the loop as before. T-001 is a UI task, so it also stops in `prototype` for your review.
+
+```bash
+harness run --project harness-bookmarks --once-through
+```
+
+When the example works, [put the harness on your own repository](/adapt).

@@ -1,0 +1,126 @@
+## Add your repository
+
+```bash
+harness projects add ~/code/my-app --name my-app
+harness projects list
+```
+
+`projects add` registers the repository in `$HARNESS_HOME/projects.json`, which is `~/.harness/projects.json` by
+default. It creates this in your repository:
+
+| Path                   | What it is                           | In git         |
+| ---------------------- | ------------------------------------ | -------------- |
+| `.harness/config.json` | the project's settings               | yes, versioned |
+| `.harness/tasks/`      | one Markdown file per task           | no             |
+| `.harness/trace/`      | the evidence every unit leaves       | no             |
+| `.harness/JOURNAL.md`  | notes agents leave for the next unit | no             |
+
+It appends those paths, `.harness/artifacts/` and `.env` to the project's `.gitignore`. A folder counts as a harness
+project only when it has `.harness/config.json`. `harness projects remove <id|name>` unregisters a project and never
+deletes files.
+
+Then create the first task with `harness new --title "…" --project my-app`, or with **New task** on the dashboard.
+
+## config.json
+
+`projects add` writes only the keys you are likely to change:
+
+```json
+{
+  "baseBranch": "main",
+  "autonomy": {
+    "mode": "gated"
+  },
+  "limits": {
+    "bounces": 2,
+    "prototypeRounds": 3,
+    "unitTimeoutMinutes": 60
+  },
+  "gate": null,
+  "probe": null,
+  "deliver": {
+    "pr": false,
+    "remote": "origin"
+  }
+}
+```
+
+Every other key keeps its default in code, so a changed default reaches every project.
+
+| Key                            | Default           | What it does                                                       | More                         |
+| ------------------------------ | ----------------- | ------------------------------------------------------------------ | ---------------------------- |
+| `baseBranch`                   | `main`            | the branch every task branch starts from                           | [Task lifecycle](/lifecycle) |
+| `autonomy.mode`                | `gated`           | `gated`: a plan and a prototype wait for you; `full`: they move on | [Task lifecycle](/lifecycle) |
+| `limits.bounces`               | `2`               | how many rejections park a task for you                            | [Contracts](/contracts)      |
+| `limits.prototypeRounds`       | `3`               | the most prototype rounds per task                                 | [Task lifecycle](/lifecycle) |
+| `limits.unitTimeoutMinutes`    | `60`              | a unit that runs longer is a hard stop                             | [Contracts](/contracts)      |
+| `gate`                         | `null`            | the project's check command; a task's own `gate:` wins             | [Contracts](/contracts)      |
+| `probe`                        | `null`            | a command that must exit 0 before a unit starts                    | [Contracts](/contracts)      |
+| `deliver.pr`, `deliver.remote` | `false`, `origin` | push the branch and open a pull request for a done task            | [Task lifecycle](/lifecycle) |
+
+Keys you can add when you need them:
+
+| Key                    | Default                             | What it does                                                                  | More                      |
+| ---------------------- | ----------------------------------- | ----------------------------------------------------------------------------- | ------------------------- |
+| `roles.models`         | coordinators `sonnet`, judge `opus` | the model per role; the judge must differ from the implementer and the tester | [Roles](/roles)           |
+| `roles.mergeQaJudge`   | `false`                             | one review unit per task instead of two                                       | [Roles](/roles)           |
+| `notify.events`        | all seven                           | which Telegram events to send                                                 | [Running the loop](/loop) |
+| `agent.command`        | `null`                              | a command that replaces `claude`, like `AGENT_CMD`                            |                           |
+| `agent.permissionMode` | `dontAsk`                           | `claude --permission-mode`: refuse what is not allowed instead of waiting     |                           |
+| `agent.allowedTools`   | a list                              | `claude --allowedTools`; commits and pushes are absent on purpose             |                           |
+| `agent.settingSources` | `project,local`                     | `claude --setting-sources`: your personal hooks never fire inside the loop    |                           |
+| `supervisor.*`         | in code                             | poll and wait intervals, and `barrenUnits: 3`                                 | [Running the loop](/loop) |
+
+## Your own specialist
+
+A specialist is one Markdown file. Put it in `<project>/.claude/agents/`. The harness merges that folder with its base
+agents, and a file with a base agent's name replaces that agent.
+
+```markdown
+---
+name: a11y-reviewer
+description: Checks every changed screen for keyboard access and contrast, and reports what fails.
+model: sonnet
+tools: Read, Grep, Glob
+stages: [qa]
+when: in the qa stage of a `kind: ui` task
+---
+
+You review accessibility. You change nothing.
+```
+
+| Field         | What it means                                                         |
+| ------------- | --------------------------------------------------------------------- |
+| `name`        | the agent's name; the file name when it is missing                    |
+| `description` | required: one line the coordinator reads to decide whether to call it |
+| `model`       | its model; `roles.models.<name>` overrides it                         |
+| `tools`       | the tools it may use                                                  |
+| `stages`      | the stages that offer it; without `stages`, every stage offers it     |
+| `when`        | a hint for the coordinator: in which tasks to call it                 |
+
+Then add the standing rules to the file and check the registry:
+
+```bash
+harness agents --sync --project my-app
+harness agents --check --project my-app
+```
+
+The coordinator of each stage reads the offered specialists and calls the ones the task needs.
+
+## Environment variables
+
+| Variable                                 | What it changes                                                                  |
+| ---------------------------------------- | -------------------------------------------------------------------------------- |
+| `HARNESS_HOME`                           | where the project registry and the fallback `.env` live; `~/.harness` by default |
+| `HARNESS_AGENTS_DIR`                     | the folder of base agents; harness-demo's `agents/` by default                   |
+| `AGENT_CMD`                              | a command that replaces `claude` for every unit; the fake agent uses it          |
+| `HARNESS_GH`                             | a command that replaces `gh` for delivery                                        |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Telegram notifications, described on [Running the loop](/loop)                   |
+
+## Before the first real run
+
+1. The base branch is clean and up to date. The supervisor refuses a dirty tree it did not make.
+2. The gate passes when you run its command yourself.
+3. `harness agents --check` ends with `ok`.
+4. `harness preview T-NNN` shows the prompt you expect.
+5. The first run is short: use `--once-through` or `--max-units <n>`, and keep the dashboard open.

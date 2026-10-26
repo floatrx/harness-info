@@ -8,7 +8,7 @@ import { chromium } from 'playwright-core';
 const base = process.argv[2] ?? 'http://localhost:3012';
 const out = process.argv[3] ?? '.shots';
 const locales = ['uk', 'en'];
-const pages = ['', 'concepts', 'roles', 'coordination', 'lifecycle', 'loop', 'contracts', 'dashboard', 'lessons'];
+const pages = ['', 'concepts', 'roles', 'coordination', 'lifecycle', 'loop', 'contracts', 'dashboard', 'quickstart', 'adapt', 'lessons'];
 const widths = [1440, 390];
 
 mkdirSync(out, { recursive: true });

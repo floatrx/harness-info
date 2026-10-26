@@ -1,5 +1,5 @@
 /** Content pages in reading order. Titles and goals live in `messages/<locale>.json` under `pages.<slug>`. */
-export const docSlugs = ['concepts', 'roles', 'coordination', 'lifecycle', 'loop', 'contracts', 'dashboard', 'lessons'] as const;
+export const docSlugs = ['concepts', 'roles', 'coordination', 'lifecycle', 'loop', 'contracts', 'dashboard', 'quickstart', 'adapt', 'lessons'] as const;
 
 export type DocSlug = (typeof docSlugs)[number];
 

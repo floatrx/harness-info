@@ -24,7 +24,8 @@ export const CodeBlock = ({ className, children, ...props }: ComponentProps<'pre
       <pre
         ref={ref}
         className={cn(
-          'overflow-x-auto rounded-panel border border-line-soft bg-surface py-3.5 pr-24 pl-4 font-mono text-[13px] leading-[1.6] text-ink',
+          // Lines wrap inside the right padding, so no line ever runs under the copy button; copying keeps the real newlines.
+          'rounded-panel border border-line-soft bg-surface py-3.5 pr-24 pl-4 font-mono text-[13px] leading-[1.6] whitespace-pre-wrap text-ink [overflow-wrap:anywhere]',
           className,
         )}
         {...props}

@@ -14,7 +14,7 @@
     "demo": "Demo",
     "demoTip": "Demo repo on GitHub",
     "githubTip": "This site's code",
-    "chaptersMeta": "8 chapters · ~45 min",
+    "chaptersMeta": "10 chapters · ~55 min",
     "here": "you are here",
     "whereAmI": "Where you are",
     "siteNav": "Site sections",
@@ -50,6 +50,14 @@
       "title": "Dashboard",
       "goal": "Know where each thing lives in the dashboard and what you can press there."
     },
+    "quickstart": {
+      "title": "Quickstart",
+      "goal": "Take one task from draft to commit on the example app, first without spending a token."
+    },
+    "adapt": {
+      "title": "Your own project",
+      "goal": "Point the harness at your repository and tune it to your stack."
+    },
     "lessons": {
       "title": "Lessons",
       "goal": "Skip the expensive mistakes that were already made once."
@@ -81,14 +89,14 @@
     "title": "A harness runs Claude Code unattended",
     "lead": "A harness is a small program around Claude Code. It gives the agent one unit of work at a time, checks the result with code instead of taking the agent's word, and keeps all its state in files. A run can go for hours, and you can pause it at any moment.",
     "primary": "Start with the concepts",
-    "secondary": "Open the demo repo",
+    "secondary": "Try it in 5 minutes",
     "flowTitle": "One task, thirteen columns",
     "flowLead": "You write a two-line draft. Agents turn it into a spec, a plan, code, a review and a commit. You step in only where a human decision is needed.",
     "human": "you",
     "agent": "agent",
     "nobody": "end",
     "readTitle": "Read it in this order",
-    "readLead": "Eight pages, about forty-five minutes. Each one has a single goal, stated at the top.",
+    "readLead": "Ten pages, about fifty-five minutes. Each one has a single goal, stated at the top.",
     "goal": "Understand what a harness is and pick where to start.",
     "tocWhat": "What a harness is"
   },

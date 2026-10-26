@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const root = path.join(import.meta.dirname, '..', 'src');
 const locales = ['uk', 'en'];
-const slugs = ['concepts', 'roles', 'coordination', 'lifecycle', 'loop', 'contracts', 'dashboard', 'lessons'];
+const slugs = ['concepts', 'roles', 'coordination', 'lifecycle', 'loop', 'contracts', 'dashboard', 'quickstart', 'adapt', 'lessons'];
 const problems: string[] = [];
 
 const files = Object.fromEntries(locales.map((locale) => [locale, new Set(readdirSync(path.join(root, 'content', locale)))]));

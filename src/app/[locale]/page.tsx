@@ -5,7 +5,6 @@ import { GoalLine } from '@/components/doc/goal-line';
 import { Dock } from '@/components/shell/dock';
 import { TopLine } from '@/components/shell/top-line';
 import { docSlugs } from '@/config/navigation';
-import { siteConfig } from '@/config/site';
 import { Link } from '@/i18n/navigation';
 
 export default async function HomePage() {
@@ -36,14 +35,12 @@ export default async function HomePage() {
             >
               {t('home.primary')} →
             </Link>
-            <a
-              href={siteConfig.demoRepo}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/quickstart"
               className="inline-flex h-10 items-center rounded-btn border border-line px-3.5 text-[13.5px] font-medium text-ink transition-colors hover:bg-surface-2"
             >
               {t('home.secondary')}
-            </a>
+            </Link>
           </div>
         </section>
 
