@@ -22,7 +22,7 @@ harness self-test
 Це триває близько п'ятнадцяти секунд і закінчується так:
 
 ```text
-33/33 cases passed
+35/35 cases passed
 ```
 
 Alias живе до кінця цього shell. Команди нижче запускай із теки harness-demo.
@@ -37,7 +37,7 @@ harness example ~/harness-bookmarks
 copied examples/app → ~/harness-bookmarks
 pnpm install …
 initial commit on main
-registered ad2610 · harness-bookmarks
+registered aab2de · harness-bookmarks
 
 next:
   harness submit T-002 --project harness-bookmarks
@@ -86,7 +86,7 @@ Fake agent грає кожну роль за сценарієм. Він нічо
    ```
 
    ```text
-   supervisor · start · pid 8653 · once-through
+   supervisor · start · pid 78911 · once-through
    supervisor · billing: a stand-in replaces claude — no tokens
    unit 1 · T-002 · spec · writer · start
    unit 1 · T-002 · spec · exit 0 · spec → plan
@@ -106,10 +106,10 @@ Fake agent грає кожну роль за сценарієм. Він нічо
    ```
 
    ```text
-   supervisor · start · pid 8749 · once-through
+   supervisor · start · pid 79005 · once-through
    supervisor · billing: a stand-in replaces claude — no tokens
    unit 3 · T-002 · implement · implementer · start
-   unit 3 · T-002 · implement · exit 0 · implementing → qa · commit 563721b
+   unit 3 · T-002 · implement · exit 0 · implementing → qa · commit 40b83f1
    unit 4 · T-002 · qa · qa · start
    unit 4 · T-002 · qa · exit 0 · qa → judge
    unit 5 · T-002 · judge · judge · start
@@ -130,8 +130,8 @@ Fake agent грає кожну роль за сценарієм. Він нічо
    T-002  done         Do not add the same URL twice
    T-003  draft        Make the bookmarks better
 
-   563721b T-002: Do not add the same URL twice (round 1)
-   6edcc88 chore: example app from harness-demo
+   40b83f1 T-002: Do not add the same URL twice (round 1)
+   da96747 chore: example app from harness-demo
    ```
 
    Harness зробив один коміт у гілку задачі, після того як пройшов гейт. Більше нічого не змінилось.

@@ -29,7 +29,8 @@ The runner builds every coordinator's prompt from five parts, in this order:
 3. **the specialists of this stage** — each one's name, when to call it, and its description;
 4. **`## Memory`** — measured facts and notes from earlier units, described [below](#memory-between-units);
 5. **`## This run`** — the facts of this unit: task, file, stage, branch, base, scope, gate, artifacts folder, bounces
-   and the verdict line the stage requires.
+   the verdict line the stage requires, and the task-file sections this stage may write. Anything else goes inside
+   those sections as `###` subsections; any other `##` heading stops the unit.
 
 ### How the coordinator is started
 
@@ -108,7 +109,9 @@ A fresh context remembers nothing, so the runner writes a short memory into ever
 1. **measured facts** — the task's status and bounces, its last handoffs with their verdicts and reasons, and the diff
    stat of its branch;
 2. **the tail of the task's `## Log`**;
-3. **the tail of `JOURNAL.md`** — the notes earlier units left for later ones.
+3. **the tail of `JOURNAL.md`** — the notes earlier units left for later ones;
+4. **the other tasks on the board** — id, status and title, for spec and plan units only, so a spec never recommends
+   what another task already does.
 
 Facts come first because a journal entry is one agent's opinion, and a status in a file is not. No hook is involved and
 nothing is written into the project's settings: the runner builds the section itself, so `harness preview` shows it too.

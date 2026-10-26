@@ -136,7 +136,9 @@ new commits **or** new handoffs, not just one of them.
 
 Exit code 4 means the agent never got to work, so the task is untouched. The supervisor waits and tries again: it
 probes the network every 30 seconds, and when the network is fine but the agent is still refused, for example by a
-usage limit, it naps for 30 minutes before the next try. After six hours of waiting it gives up and stops with code 4.
+usage limit, it naps for 30 minutes before the next try. When the refusal names a reset time, such as "You've hit
+your session limit · resets 9:10pm (Europe/Kiev)", it waits until that time plus one minute instead, and logs
+`agent could not run (…) — waiting until <time>`. Session and weekly limits count as usage limits too. After six hours of waiting it gives up and stops with code 4.
 The timings are `supervisor.usageProbeSeconds`, `supervisor.usageNapSeconds` and `supervisor.usageCeilingSeconds` in
 `config.json`.
 
@@ -154,6 +156,12 @@ The safe order:
 2. Wait until the running unit finishes. The dashboard shows when nothing is in flight.
 3. Make your edit and commit it.
 4. Resume.
+
+Task actions are the exception. Approve, answer, revise and the rest, from the dashboard or the CLI, go through a
+ledger: the harness records each human write to a task file in `.harness/trace/human-writes.jsonl`, and the scope
+contract excuses a task file whose content matches that record. An approve made while another task's unit runs is
+kept. Inside a unit, the human CLI actions refuse to run, so an agent cannot pose as you. The ledger stops mistakes,
+not an agent that forges the ledger itself.
 
 The same reason allows only one loop per checkout. Running tasks side by side needs one git worktree per task, which is
 planned after the first version.
@@ -202,6 +210,11 @@ the task id and title, the event and the pull request link. It never links to th
 way: the harness only sends. A failed send never fails a unit; it adds one `notify · … not sent` line to
 `progress.log`, with the token removed.
 
+Telegram gets each message once. A repeat, with the same project and text after ids and times are set aside, is held
+back for six hours, and the whole chat gets at most six messages a minute. A held-back message logs
+`notify · <event> held back: <why>`, and the record lives in `$HARNESS_HOME/notify-sent.json`. A project folder that no
+longer exists sends nothing, and an agent outage is reported once.
+
 ```bash
 harness notify --project bookmarks          # where the keys come from; never prints the token
 harness notify --project bookmarks --test   # send one test message
@@ -225,4 +238,5 @@ between branches would make the checkout fail. A task's history lives in its `##
 | `handoffs.jsonl`        | what each unit handed to the next: start time, verdict, tokens, cost and any permission denials                                   |
 | `unit-seq`              | the counter that numbers units                                                                                                    |
 | `unit-NNNN.jsonl`       | one file per unit: the agent's stream-json output, each line stamped with `harness_ts`; the trace contract finds the verdict here |
+| `human-writes.jsonl`    | every human write to a task file, with its hash; the scope contract excuses a matching file                                       |
 | `unit-NNNN.agents.json` | the specialists passed to that unit with `--agents`                                                                               |

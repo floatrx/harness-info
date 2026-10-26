@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { getTranslations } from 'next-intl/server';
 
 import { ShotFigure } from '@/components/mdx/shot-figure';
+import { shotVersions } from '@/config/shot-version';
 import shots from '@/config/shots.json';
 
 type ShotName = keyof typeof shots;
@@ -17,6 +18,7 @@ interface Props {
 }
 
 const code = (chunks: ReactNode) => <code>{chunks}</code>;
+const versions = shotVersions();
 
 /** A real dashboard screenshot. Marker positions come from `config/shots.json`, their texts from `messages.shots`. */
 export const Shot = async ({ name, plain, eager }: Props) => {
@@ -32,7 +34,7 @@ export const Shot = async ({ name, plain, eager }: Props) => {
   return (
     <ShotFigure
       id={`shot-${name}`}
-      src={`/screenshots/${name}.png`}
+      src={`/screenshots/${name}.png?v=${versions[name]}`}
       alt={t(`${name}.alt`)}
       caption={t.rich(`${name}.caption`, { code })}
       markers={markers}

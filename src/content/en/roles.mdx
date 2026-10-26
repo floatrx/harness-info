@@ -38,7 +38,11 @@ Each card says what the role reads, what it writes, and which verdict token code
   and how closure is proven.
 </Role>
 
-<Role id="designer" input="the plan of a ui task" output="## Prototype — a prototype route in the app and its screenshot, prototype.png">
+<Role
+  id="designer"
+  input="the plan of a ui task"
+  output="## Prototype — a prototype route and its picture: prototype.svg, or prototype.png when a screenshot is possible"
+>
   Runs only for tasks with `kind: ui`. It builds a clickable prototype and stops. You accept it or leave a comment, and it goes another
   round.
 </Role>

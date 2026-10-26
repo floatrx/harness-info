@@ -137,7 +137,7 @@
           "planned": "The plan waits for you. You approve it, and because this is a logic task, it skips the prototype.",
           "ready": "Approved and waiting. The next unit picks it up.",
           "implementing": "The implement unit: the harness creates the branch harness/T-002-…, the tester writes the test and the implementer the code. The gate is green, so the harness commits.",
-          "qa": "The qa unit runs the tests, walks the criteria on the running app and prints qa: PASS.",
+          "qa": "The qa unit runs every [closes] command and the gate, checks the criteria it can, and prints qa: PASS.",
           "judge": "The judge unit, a different model, re-runs the [closes] command and looks for a reason to reject. It prints judge: CONFIRMED.",
           "done": "Confirmed. Without PR delivery, the commit on the task branch is the delivery, and the card stays here.",
           "delivered": "With deliver.pr: true, the runner pushes the branch and opens a pull request itself: no agent, no tokens. A human merges it."
@@ -230,7 +230,7 @@
         "hold": {
           "prepare": "The runner picks T-002 in qa and takes a snapshot.",
           "start": "It starts a fresh coordinator with the qa prompt.",
-          "dispatch": "The coordinator calls qa: run the tests and walk the criteria on the running app.",
+          "dispatch": "The coordinator calls qa: run every [closes] command and the gate, and check the criteria it can.",
           "hold": "It holds the turn with tool calls while qa works.",
           "report": "qa reports that every criterion is met.",
           "finish": "The coordinator prints the line qa: PASS and exits.",
@@ -240,7 +240,7 @@
         "early": {
           "prepare": "The runner picks T-002 in qa and takes a snapshot.",
           "start": "It starts a fresh coordinator with the qa prompt.",
-          "dispatch": "The coordinator calls qa: run the tests and walk the criteria on the running app.",
+          "dispatch": "The coordinator calls qa: run every [closes] command and the gate, and check the criteria it can.",
           "early": "The coordinator writes “Waiting for the results”. A message without a tool call ends the turn, and claude -p exits.",
           "lost": "qa's answer has nobody left to receive it.",
           "trace": "The runner finds no qa: line in the unit's output. The trace contract fails: a hard stop, exit code 1.",
@@ -348,7 +348,7 @@
         "prototype": "The designer drafts a prototype; then it waits in review for your Accept or Comment.",
         "ready": "Approved and waiting for the implement unit.",
         "implementing": "The implement unit: the tester and the implementer, with the debugger first after a bounce. The harness commits after a green gate.",
-        "qa": "The qa unit runs the tests and walks the criteria on the running app. Read-only.",
+        "qa": "The qa unit runs every [closes] command and the gate, and checks the criteria it can. Read-only.",
         "judge": "The judge unit, a different model, re-runs every [closes] and tries to reject.",
         "done": "Confirmed. With deliver.pr on, the runner's delivery step comes next.",
         "delivered": "The branch is pushed and the pull request is open. A human merges it.",
@@ -404,7 +404,7 @@
         "tab": "The Prototype tab appears for UI tasks.",
         "accept": "Accept moves the task to <code>ready</code>.",
         "comment": "Or write what the next round should change. The drawer shows how many rounds are left.",
-        "preview": "The round's picture from the task's artifacts folder: the designer's <code>prototype.png</code> (a screenshot) or <code>prototype.svg</code> (a wireframe). In this walkthrough the fake agent drew an SVG.",
+        "preview": "The round's picture from the task's artifacts folder. Units have no browser, so the designer usually draws <code>prototype.svg</code>, a 1440 px wireframe with the page's real copy, layout and colours; <code>prototype.png</code> appears when an allowed command can take a screenshot. Here the fake agent drew it.",
         "draft": "Your draft, to compare the picture with what you asked for."
       }
     },

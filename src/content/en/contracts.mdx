@@ -48,6 +48,10 @@ anywhere else fails the unit.
 A second fence stands behind this one: the agent's tool allowlist (`agent.allowedTools`) has no git commit and no push.
 Only the runner commits.
 
+A task file you changed during the unit, by an approve or an answer, is not the unit's doing: the harness keeps a
+ledger of human writes, and the scope contract excuses a file whose content matches it. An agent's edit of another
+task file still parks the unit.
+
 ## Gate, and why narrowing matters
 
 The gate is the command that must pass: the task's `gate:` plus the project default, usually types, lint and tests.
@@ -113,6 +117,10 @@ Continuing the T-002 illustration:
 2. **[found]** adding a URL that is already in the list keeps the old bookmark and tells the user
 3. **[process]** a human reads the message wording
 ```
+
+The loop reads only criteria numbered `N. [tag]`. A tagged line numbered `1a.` or written as a bullet is not read; the
+plan contract names it, "not read as a criterion, number it `N.`: …", parks the plan, and `harness status` shows the
+message.
 
 The command is the first backtick span **after a colon**, so names in backticks before it stay plain text. A
 criterion without a colon falls back to its first span, so older task files still parse. Before any code is written,
