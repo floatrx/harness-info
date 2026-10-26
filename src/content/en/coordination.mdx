@@ -1,0 +1,111 @@
+## One unit, step by step
+
+A unit is the smallest piece of work the harness runs. Here is everything that happens in one of them. The runner
+is plain code; only the middle steps involve a model.
+
+| Step     | Who         | What happens                                                                                              |
+| -------- | ----------- | --------------------------------------------------------------------------------------------------------- |
+| Pick     | runner      | Reads the corpus and takes the next task whose status an agent owns and that is not already running.      |
+| Branch   | runner      | From the implement stage on, switches to the task branch, creating it the first time.                     |
+| Snapshot | runner      | Records the branch, the last commit and the dirty files, so it can compare after the unit.                |
+| Start    | runner      | Starts a coordinator with `claude -p`, the stage prompt, and this stage's specialists through `--agents`. |
+| Dispatch | coordinator | Reads the agent registry, picks the specialists this task needs and calls them.                           |
+| Wait     | coordinator | Holds the turn until every specialist has answered.                                                       |
+| Answer   | specialists | Each one does its narrow job, writes only what it owns, and reports back to the coordinator.              |
+| Finish   | coordinator | Writes what the unit decided into the task file, prints the verdict line its stage requires, and ends.    |
+| Check    | runner      | Runs the contracts in this order: scope, task file, trace, gate, closing.                                 |
+| Record   | runner      | Moves the status, commits after a green gate, or parks the task with the reason.                          |
+
+Step through the same unit as messages between the runner, the coordinator and its specialists. The third scenario shows what happens when the coordinator stops holding the turn.
+
+<CoordinatorSequence />
+
+## What the coordinator is told
+
+The runner builds every coordinator's prompt from five parts, in this order:
+
+1. **the stage prompt** — `prompts/spec.md`, `prompts/plan.md`, `prompts/implement.md` and so on, one per stage;
+2. **the standing rules** — the rules every agent needs, such as never killing processes by pattern;
+3. **the specialists of this stage** — each one's name, when to call it, and its description;
+4. **`## Memory`** — measured facts and notes from earlier units, described [below](#memory-between-units);
+5. **`## This run`** — the facts of this unit: task, file, stage, branch, base, scope, gate, artifacts folder, bounces
+   and the verdict line the stage requires.
+
+### How the coordinator is started
+
+The runner starts `claude` directly, without a shell. A smoke run against Claude Code 2.1.308 accepted this command:
+
+```bash
+claude -p --output-format stream-json --verbose --model <model> \
+  --permission-mode dontAsk --setting-sources project,local \
+  --agents .harness/trace/unit-NNNN.agents.json --allowedTools …
+```
+
+- `--agents` passes the specialists of this stage, merged from the base registry and the project's own.
+- `--permission-mode dontAsk` denies a tool that is not allowed, instead of waiting for a human who is not there. In the
+  smoke run a `git commit` was denied at once, with no stall, and the denial was listed in the result event's
+  `permission_denials`.
+- The allowlist in `agent.allowedTools` has no git commit and no push. It is a second fence behind the scope contract:
+  commits are the runner's job.
+- `--setting-sources project,local` keeps your personal user hooks out of the loop.
+- The environment sets `CLAUDE_CODE_DISABLE_CLAUDE_MDS=1`, so agents do not load the project's `CLAUDE.md` files and
+  spend those tokens on the task instead.
+
+`harness preview T-002` prints the exact command and prompt of the task's next unit, and spends no tokens.
+
+## Hold the turn
+
+This is the rule that breaks most first attempts at a coordinator.
+
+In the Claude Code CLI, every call to a sub-agent is **asynchronous**: the call returns at once and the specialist
+works in the background. In `claude -p`, a message without a tool call **ends the turn**, and with it the process.
+
+So a coordinator that dispatches three specialists and then writes "Waiting for the results" has just ended the
+unit. The specialists finish a minute later and their answers go to nobody.
+
+<Note title="The rule">
+  Dispatch every specialist, then keep making tool calls — read the trace, re-read the task file — until each one has reported. Only then
+  write the final message.
+</Note>
+
+The trace contract is the safety net: if a required verdict is missing, the unit fails instead of passing on
+silence.
+
+## The build chain: implement, qa, judge
+
+Building, checking and judging are three separate units. Each one starts a fresh coordinator, so the judge has
+never seen the implementer's reasoning, only its result. Inside the implement unit, the tester writes the tests first
+and the implementer writes the code that makes them pass.
+
+| Unit      | Reads                                           | May write                                                             | Exits to                                                          |
+| --------- | ----------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| implement | the plan, its scope; after a bounce, the report | tests and code inside `scope`; the harness commits after a green gate | `qa`                                                              |
+| qa        | the commit and the criteria                     | only `.harness/artifacts/T-NNN/`                                      | PASS → `judge` · FAIL → `implementing` · CANNOT VERIFY → `parked` |
+| judge     | the commit, the plan, the qa report             | only `.harness/artifacts/T-NNN/`                                      | CONFIRMED → `done` · REJECTED → `implementing`                    |
+
+The harness, not an agent, makes the commit after each implement unit with a green gate, on the task branch, as
+`T-NNN: <title> (round n)`. qa and judge review that commit.
+
+## The bounce cap
+
+A qa FAIL or a judge REJECTED sends the task back to `implementing` and adds one to `bounces` in its frontmatter.
+Both share the same counter.
+
+Before the implementer starts a bounced round, the implement unit calls the **debugger**. It reads the qa or judge
+report, finds the cause, and hands the implementer a diagnosis, so the next round fixes the cause instead of
+retrying blind.
+
+The rejection that brings `bounces` to `limits.bounces` — 2 by default — does not send the task back. It parks it,
+with the reason, for a human: at most two implement rounds. Without a cap, an implementer and a judge can disagree forever, and every round costs a full unit.
+
+## Memory between units
+
+A fresh context remembers nothing, so the runner writes a short memory into every prompt, as its `## Memory` section:
+
+1. **measured facts** — the task's status and bounces, its last handoffs with their verdicts and reasons, and the diff
+   stat of its branch;
+2. **the tail of the task's `## Log`**;
+3. **the tail of `JOURNAL.md`** — the notes earlier units left for later ones.
+
+Facts come first because a journal entry is one agent's opinion, and a status in a file is not. No hook is involved and
+nothing is written into the project's settings: the runner builds the section itself, so `harness preview` shows it too.

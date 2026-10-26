@@ -1,0 +1,150 @@
+## The board
+
+In harness-demo every stage is a column on a kanban board, and a task's `status` is the column it rests in. One
+status, one column, one owner. A card shows a "working" badge while a unit is working on it.
+
+| Column = `status` | Owner               | What happens there                                                                                                               | Moves on to                                   |
+| ----------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `draft`           | you                 | You write a title and a few lines. **Submit** or a drag moves it on.                                                             | `spec`                                        |
+| `spec`            | writer              | The spec unit writes the spec.                                                                                                   | `plan` · `needs-input`                        |
+| `needs-input`     | you                 | You answer the open questions on the card.                                                                                       | back to the stage that asked                  |
+| `plan`            | explorer, planner   | The explorer maps the code; the planner writes phases, `scope`, `gate` and criteria.                                             | `planned` · `needs-input`                     |
+| `planned`         | you                 | You approve the plan by dragging the card on.                                                                                    | `prototype` for ui tasks, else `ready`        |
+| `prototype`       | designer, then you  | The designer builds a prototype; you accept it or comment.                                                                       | `ready` · another round                       |
+| `ready`           | approved, waiting   | Nothing runs yet.                                                                                                                | `implementing` when the implement unit starts |
+| `implementing`    | tester, implementer | The tester writes the tests, the implementer the code; the harness commits after a green gate.                                   | `qa` · `parked`                               |
+| `qa`              | qa                  | Walks the criteria on the running app.                                                                                           | `judge` · `implementing` · `parked`           |
+| `judge`           | judge               | Re-runs every closing check and tries to reject.                                                                                 | `done` · `implementing`                       |
+| `done`            | runner              | With `deliver.pr` on, the runner pushes the branch and opens the PR, with no agent and no tokens. Without it, `done` is the end. | `delivered` with `deliver.pr`, otherwise none |
+| `delivered`       | —                   | The branch is pushed and the PR is open.                                                                                         | end: a human merges                           |
+| `parked`          | you                 | Stopped with a reason. **Reopen** sends it back.                                                                                 | the status it was parked from                 |
+
+Pick a status to see who owns it and every way out of it. The switches add the moves that exist only with full
+autonomy or merged review.
+
+<StateMachine />
+
+<Shot name="board" plain />
+
+## Who moves the card
+
+Only two kinds of move exist, and they never mix.
+
+**You move a card** when a human decision is needed: submit a draft, answer questions, approve a plan, accept or
+comment on a prototype, reopen a parked task. In the dashboard these are drags or buttons. A drag is allowed only
+along a human move, and it is refused while a unit is working on that task.
+
+Every human move also exists as a command, for when you work from a terminal:
+
+```bash
+harness new --title "Dark mode toggle" --draft "Users want a dark theme." --kind ui
+harness submit T-007        # draft → spec
+harness answer T-007 Q1 a   # answer an open question, with an optional note
+harness approve T-007       # planned → prototype (ui) or ready
+harness comment T-007 "move the toggle left of the avatar"
+harness accept T-007        # prototype → ready
+harness reopen T-007        # parked → the status it was parked from
+```
+
+Add `--project <path>` when you are not inside the project folder.
+
+**The harness moves a card** after a unit ends and its contracts pass. No agent writes `status` directly; the runner
+does, from the unit's outcome.
+
+## The interview
+
+Agents ask instead of guessing. The writer asks product questions at draft time; the planner asks questions that only
+appear once it has read the code. Both use the same protocol:
+
+1. The agent appends a question to `## Questions` with two to four lettered options, the recommended one first.
+2. It sets `status: needs-input` and `resume:` to its own stage, and ends the unit green.
+3. The dashboard shows the open questions as a picker on the card.
+4. Your answer is written under the question, and the question flips to `answered`.
+5. When no question is open, the harness moves the task back to the stage in `resume`.
+
+```markdown
+### Q1 · Where should the toggle live? · open
+
+- (a) Header, right of the nav — recommended: visible on every page
+- (b) Settings page only
+- (c) Both
+
+> **Answer:**
+```
+
+<Note title="A real run">
+  In a smoke run on Claude Code 2.1.308, the draft was only "Somehow make it nicer". The coordinator called the writer and held the turn.
+  The writer wrote a spec, draft criteria and three questions in exactly this form, and the runner moved the task to `needs-input` with
+  `resume: spec`. The unit took 27 seconds, 4 turns and $0.106.
+</Note>
+
+<Shot name="task-questions" plain />
+
+## The prototype step
+
+Tasks with `kind: ui` get one more stage before code. The designer builds a prototype as a route in the app and saves a
+screenshot of it, `prototype.png` (1440 px wide), in the task's artifacts folder. Only when the app cannot run does it
+draw a wireframe, `prototype.svg`, instead. The dashboard shows the picture on the card and in the drawer; a round that
+leaves none gets a note in `## Log`, and you can still review the route. The card stops in `prototype` and waits for
+you:
+
+- **Accept** moves the task to `ready`.
+- **Comment** sends it back to the designer for another round, with your comment in `### Review`.
+
+Rounds are capped by `limits.prototypeRounds`, 3 by default. The prototype route is dropped at delivery unless the
+plan says to keep it.
+
+<Shot name="prototype-review" plain />
+
+## How much autonomy
+
+By default, with `autonomy.mode: gated`, the harness stops for you twice per task: to approve the plan and to review a
+prototype.
+
+`autonomy.mode: full` turns both gates off. A planned task moves on by itself, and a finished prototype goes straight to
+`ready`. Two things still need a human even in full mode: a draft needs **Submit**, and an open question needs an answer.
+
+## Branches and delivery
+
+- The first time a task enters `implementing`, the harness creates the branch `harness/T-NNN-<slug>` from the
+  project's base branch. That branch is the only one the scope contract allows.
+- After every implement unit with a green gate, the harness commits on that branch.
+- By default delivery is the commit: with `deliver: { pr: false }`, a task ends in `done`.
+- The base branch must be clean before a batch. The supervisor refuses a dirty tree it did not make.
+
+### Delivery by pull request
+
+Set `deliver.pr: true` in `config.json`, and `deliver.remote` if it is not `origin`. A `done` task then gets one more
+step. The runner does it itself: no agent, no tokens
+([`harness/deliver.ts`](https://github.com/floatrx/harness-demo/blob/main/harness/deliver.ts)).
+
+1. It checks the branch contract: the task branch exists, it is ahead of the base branch, and every commit subject
+   starts with `T-NNN:`.
+2. It writes the pull request body to `.harness/artifacts/T-NNN/pr-body.md`: the goal from the spec, the plan, each
+   acceptance criterion with a ✓ and its command for `[closes]`, the qa and judge verdicts with their unit numbers, and
+   the commits.
+3. It pushes the branch with `git push -u <remote> <branch>`.
+4. It opens the pull request with `gh pr create`. It asks `gh pr view <branch>` first, so a retry never opens a second
+   one.
+5. It writes `pr: <url>` into the task file and moves the task from `done` to `delivered`.
+
+Nothing ever merges. The only `gh` commands the harness runs are `gh auth status`, `gh pr view` and `gh pr create`;
+merging is yours. If the branch contract, the push or `gh` fails, the task is parked with the reason
+(`parked: deliver: …`), and **Reopen** retries the step.
+
+With `deliver.pr` on, the supervisor checks before it starts: a remote, `gh` installed and logged in, and the base branch
+on the remote. If one is missing, it exits with code 2 and prints the fix. `HARNESS_GH` replaces the `gh` command the
+way `AGENT_CMD` replaces the agent; the self-tests use it.
+
+<Note title="A real one">
+  The public repository floatrx/harness-demo-bookmarks holds a pull request the runner opened:
+  [#1](https://github.com/floatrx/harness-demo-bookmarks/pull/1). It is a delivery demo by the stand-in agent, so the fake agent wrote the
+  code, not Claude. It stays open, because merging is yours.
+</Note>
+
+## What one task costs
+
+A full task runs up to six agent units: spec, plan, prototype, implement, qa and judge, each with a fresh
+coordinator. Delivery adds a runner step that spends no tokens. That is more than a single long session would use. The trade is visibility, since every card rests in the
+column that owns it, and a clean context for every role. harness-demo measures the real cost per stage in its pilot
+before anyone tunes it.

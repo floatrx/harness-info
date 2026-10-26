@@ -1,0 +1,47 @@
+{
+  "scenarios": [
+    {
+      "id": "implement",
+      "lifelines": ["runner", "coordinator", "tester", "implementer"],
+      "steps": [
+        { "id": "prepare", "from": "runner", "to": "runner", "kind": "self" },
+        { "id": "start", "from": "runner", "to": "coordinator", "kind": "call" },
+        { "id": "tester", "from": "coordinator", "to": "tester", "kind": "call" },
+        { "id": "testerDone", "from": "tester", "to": "coordinator", "kind": "return" },
+        { "id": "implementer", "from": "coordinator", "to": "implementer", "kind": "call" },
+        { "id": "hold", "from": "coordinator", "to": "coordinator", "kind": "hold" },
+        { "id": "implementerDone", "from": "implementer", "to": "coordinator", "kind": "return" },
+        { "id": "finish", "from": "coordinator", "to": "runner", "kind": "return" },
+        { "id": "contracts", "from": "runner", "to": "runner", "kind": "check" },
+        { "id": "commit", "from": "runner", "to": "runner", "kind": "self" }
+      ]
+    },
+    {
+      "id": "hold",
+      "lifelines": ["runner", "coordinator", "qa"],
+      "steps": [
+        { "id": "prepare", "from": "runner", "to": "runner", "kind": "self" },
+        { "id": "start", "from": "runner", "to": "coordinator", "kind": "call" },
+        { "id": "dispatch", "from": "coordinator", "to": "qa", "kind": "call" },
+        { "id": "hold", "from": "coordinator", "to": "coordinator", "kind": "hold" },
+        { "id": "report", "from": "qa", "to": "coordinator", "kind": "return" },
+        { "id": "finish", "from": "coordinator", "to": "runner", "kind": "return" },
+        { "id": "contracts", "from": "runner", "to": "runner", "kind": "check" },
+        { "id": "move", "from": "runner", "to": "runner", "kind": "self" }
+      ]
+    },
+    {
+      "id": "early",
+      "lifelines": ["runner", "coordinator", "qa"],
+      "steps": [
+        { "id": "prepare", "from": "runner", "to": "runner", "kind": "self" },
+        { "id": "start", "from": "runner", "to": "coordinator", "kind": "call" },
+        { "id": "dispatch", "from": "coordinator", "to": "qa", "kind": "call" },
+        { "id": "early", "from": "coordinator", "to": "runner", "kind": "end" },
+        { "id": "lost", "from": "qa", "to": "coordinator", "kind": "lost" },
+        { "id": "trace", "from": "runner", "to": "runner", "kind": "fail" },
+        { "id": "park", "from": "runner", "to": "runner", "kind": "fail" }
+      ]
+    }
+  ]
+}

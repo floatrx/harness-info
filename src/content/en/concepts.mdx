@@ -1,0 +1,70 @@
+## What a harness is
+
+Claude Code in a terminal is a conversation. You ask, it works, you read the result and decide what comes next.
+That works well for one task. It does not work for twenty tasks overnight, because you are the part that has to
+stay awake.
+
+A **harness** takes your place in that conversation. It is a small program that starts Claude Code in headless mode
+(`claude -p`) again and again, gives it one piece of work per start, and checks every result with code before it
+moves on. You still decide what gets built and you still approve the parts that need a human. The harness does the
+waiting, the checking and the bookkeeping.
+
+The word comes from the gear that connects a strong animal to a cart. The harness does not pull. It points the
+strength in one direction and keeps it from running off the road.
+
+## The eight words
+
+Every other page uses these words in exactly this sense.
+
+| Word            | Meaning                                                                                                                    | Where you see it                 |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| **task**        | One thing you want done: a Markdown file with a status in its frontmatter.                                                 | `.harness/tasks/T-007.md`        |
+| **unit**        | One fresh agent run that moves one task one step forward.                                                                  | one `claude -p` process          |
+| **corpus**      | The folder of all task files. The queue is computed from it.                                                               | `.harness/tasks/`                |
+| **coordinator** | The agent a unit starts. It reads the task, calls specialists and collects their answers.                                  | the prompt for the current stage |
+| **specialist**  | An agent with one job, defined in one file: writer, explorer, planner, designer, tester, implementer, debugger, qa, judge. | `agents/*.md`                    |
+| **verdict**     | A fixed token a specialist must leave behind, so code can read the outcome.                                                | `qa: PASS`, `judge: CONFIRMED`   |
+| **contract**    | A rule checked by code after the unit, not by the agent during it.                                                         | scope, gate, trace, closing      |
+| **gate**        | The command that must pass before work counts: types, lint, tests.                                                         | `gate:` in the task file         |
+
+## Four ideas that make it work
+
+### Fresh context per unit
+
+Every unit starts a new `claude -p` process. The model remembers nothing from the unit before. Whatever the next
+unit needs is written into the task file. This sounds wasteful, but long sessions drift: early details get
+compacted away and old guesses turn into facts. A fresh context sees the task as it is now.
+
+### Disk is the state
+
+All state lives in files: the task files, an agent-written journal, and a trace folder. The harness recomputes the
+queue from those files at the start of every unit. Nothing important lives only in memory, so killing the process
+in the middle of a run costs exactly the one unit that was not finished.
+
+### A contract, not an instruction
+
+An instruction is something you tell the agent: "only edit the header component". A contract is something code
+checks afterwards: the harness compares the file tree before and after the unit and fails it if a file outside the
+allowed list changed. The agent is told about every contract, but nothing depends on it keeping its word. In a
+harness, the agent is the least trusted part.
+
+### One coordinator, many specialists
+
+A unit does not run one big agent that does everything. It runs a coordinator that picks the specialists the task
+needs, gives each one a narrow job, and waits for their verdicts. Each specialist owns one part of the task file.
+The coordinator owns the task as a whole. Commits are made by the harness itself, never by an agent.
+
+## The parts of a harness
+
+A harness has five parts. Each one owns one thing, so each one can fail without taking the others down.
+
+| Part           | What it owns                                                                                    | In harness-demo                        |
+| -------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------- |
+| **corpus**     | the task files and their statuses                                                               | `<project>/.harness/tasks/T-NNN.md`    |
+| **supervisor** | policy over time: batches, pause and stop, exit codes, waiting out usage limits, one lock       | `harness/supervise.ts`                 |
+| **runner**     | one unit: pick a task, take a snapshot, start the agent, check the contracts, record the result | `harness/runner.ts`                    |
+| **agent**      | the actual work, in a fresh context                                                             | `claude -p` with `.claude/agents/*.md` |
+| **watcher**    | what a run looks like from the outside                                                          | the dashboard on `127.0.0.1:4777`      |
+
+The [roles](/roles) page shows who the specialists are. The [loop](/loop) page shows how the supervisor and the
+runner work together, and how you start, pause and stop them.

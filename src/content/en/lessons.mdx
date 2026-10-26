@@ -1,0 +1,100 @@
+Each lesson below cost real time in a harness that ran for weeks. They are written as a problem, what it looked
+like from the outside, and the rule that came out of it. Read the rule if you read nothing else.
+
+## Closure is a property of the plan, not of the loop
+
+**Problem.** Every task had many acceptance criteria, and every one of them needed proof before the task could close.
+
+**What it looked like.** The loop was busy for hours and the board filled up with tasks that were almost done. Almost
+nothing closed.
+
+**Rule.** Tag every criterion `[closes]`, `[found]` or `[process]`, and let only `[closes]` decide closure. Aim for
+one `[closes]` per task. The gate shrank several times over and tasks started to finish.
+
+## Measure work, not one component's way of recording it
+
+**Problem.** Progress was counted as new commits. Some units do real work without committing: they write a handoff
+for the next unit.
+
+**What it looked like.** A healthy run was stopped as "barren" while it was moving forward.
+
+**Rule.** Progress is commits **or** handoffs. Count every kind of output the loop produces.
+
+## Verify every reading against the thing it claims to measure
+
+**Problem.** Numbers on the live view were trusted because they looked plausible.
+
+**What it looked like.** Three different readings turned out to measure something other than their label.
+
+**Rule.** Before you rely on a number, check it once by hand against the thing it claims to measure.
+
+## Unattended work has to be observable, or nobody trusts it
+
+**Problem.** The loop ran, but the only way to know what it was doing was to read files.
+
+**What it looked like.** Nobody let it run overnight, because nobody could see whether it was working or stuck.
+
+**Rule.** Build the watcher first, before the loop has much to show. Trust follows visibility.
+
+## A turn that ends waiting is a turn that ends
+
+**Problem.** Sub-agent calls in the CLI are asynchronous, and in `claude -p` a message without a tool call ends the turn.
+
+**What it looked like.** The coordinator dispatched its specialists, wrote "waiting for results", and the unit ended.
+The answers arrived later and went to nobody.
+
+**Rule.** Dispatch, then hold the turn with tool calls until every specialist has reported. Back it with the trace
+contract. Details on the [coordination](/coordination) page.
+
+## An observer measures the process that works, not the one waiting for it
+
+**Problem.** The watcher judged a unit by its coordinator's activity.
+
+**What it looked like.** While specialists worked, the coordinator was quiet for minutes, and the watcher reported the
+unit as stuck.
+
+**Rule.** Watch the sub-agents too. A quiet coordinator is not a stuck unit.
+
+## A progress bar whose cell is wider than a unit looks stopped
+
+**Problem.** The progress bar moved one cell per finished unit, and a unit can take a long time.
+
+**What it looked like.** The bar sat still for long stretches and people assumed the run had died.
+
+**Rule.** Show motion inside the unit: its agents, its current tool. Judge elapsed time against the measured range of
+past units, not against a guess.
+
+## A question shown beside live rows is not seen
+
+**Problem.** An agent's question to the human appeared as one more row next to busy live output.
+
+**What it looked like.** Questions waited for hours, and the task waited with them.
+
+**Rule.** A question that blocks work takes the whole frame. Make it impossible to miss.
+
+## A lexical shortcut is not a judgement
+
+**Problem.** To save tokens, a judgement that needed understanding was replaced by a word-overlap check.
+
+**What it looked like.** Items that meant the same thing in different words did not match, and items that shared words
+but meant different things did.
+
+**Rule.** If the decision needs a model, use a model. Do not replace a judgement with string matching.
+
+## A contract that stops the damage still owes you the reason
+
+**Problem.** A contract stopped a bad unit correctly, but said only that a check had failed.
+
+**What it looked like.** Every stop meant digging through logs to find out what had happened.
+
+**Rule.** Every gate message names the likely cause and the next step.
+
+## Never kill processes by pattern
+
+**Problem.** An agent tried to stop one of its own helper processes with a pattern.
+
+**What it looked like.** `pkill -f` matches the pattern anywhere in any full command line, so a short word matched
+almost every running app, including other Claude sessions.
+
+**Rule.** Stop only a process you started, by the exact PID you captured. This rule is in the standing rules of every
+agent.

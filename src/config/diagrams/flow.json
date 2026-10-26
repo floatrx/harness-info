@@ -1,0 +1,196 @@
+{
+  "scenarios": [
+    {
+      "id": "logic",
+      "task": "T-002",
+      "kind": "logic",
+      "steps": [
+        {
+          "id": "draft",
+          "status": "draft",
+          "actors": ["human"]
+        },
+        {
+          "id": "spec",
+          "status": "spec",
+          "actors": ["writer"]
+        },
+        {
+          "id": "plan",
+          "status": "plan",
+          "actors": ["explorer", "planner"]
+        },
+        {
+          "id": "planned",
+          "status": "planned",
+          "actors": ["human"]
+        },
+        {
+          "id": "ready",
+          "status": "ready",
+          "actors": ["human"]
+        },
+        {
+          "id": "implementing",
+          "status": "implementing",
+          "actors": ["tester", "implementer"]
+        },
+        {
+          "id": "qa",
+          "status": "qa",
+          "actors": ["qa"]
+        },
+        {
+          "id": "judge",
+          "status": "judge",
+          "actors": ["judge"]
+        },
+        {
+          "id": "done",
+          "status": "done",
+          "actors": ["judge"]
+        },
+        {
+          "id": "delivered",
+          "status": "delivered",
+          "actors": ["runner"]
+        }
+      ]
+    },
+    {
+      "id": "ui",
+      "task": "T-001",
+      "kind": "ui",
+      "steps": [
+        {
+          "id": "draft",
+          "status": "draft",
+          "actors": ["human"]
+        },
+        {
+          "id": "spec",
+          "status": "spec",
+          "actors": ["writer"]
+        },
+        {
+          "id": "ask",
+          "status": "needs-input",
+          "actors": ["writer"]
+        },
+        {
+          "id": "answer",
+          "status": "spec",
+          "actors": ["human"]
+        },
+        {
+          "id": "plan",
+          "status": "plan",
+          "actors": ["explorer", "planner"]
+        },
+        {
+          "id": "planned",
+          "status": "planned",
+          "actors": ["human"]
+        },
+        {
+          "id": "drafting",
+          "status": "prototype",
+          "prototype": "drafting",
+          "actors": ["designer"]
+        },
+        {
+          "id": "comment",
+          "status": "prototype",
+          "prototype": "review",
+          "actors": ["human"]
+        },
+        {
+          "id": "accept",
+          "status": "prototype",
+          "prototype": "review",
+          "actors": ["human"]
+        },
+        {
+          "id": "ready",
+          "status": "ready",
+          "actors": ["human"]
+        },
+        {
+          "id": "implementing",
+          "status": "implementing",
+          "actors": ["tester", "implementer"]
+        },
+        {
+          "id": "qa",
+          "status": "qa",
+          "actors": ["qa"]
+        },
+        {
+          "id": "judge",
+          "status": "judge",
+          "actors": ["judge"]
+        },
+        {
+          "id": "done",
+          "status": "done",
+          "actors": ["judge"]
+        }
+      ]
+    },
+    {
+      "id": "bounce",
+      "task": "T-002",
+      "kind": "logic",
+      "steps": [
+        {
+          "id": "ready",
+          "status": "ready",
+          "actors": ["human"],
+          "bounces": 0
+        },
+        {
+          "id": "round1",
+          "status": "implementing",
+          "actors": ["tester", "implementer"],
+          "bounces": 0
+        },
+        {
+          "id": "qaFail",
+          "status": "qa",
+          "actors": ["qa"],
+          "bounces": 0
+        },
+        {
+          "id": "round2",
+          "status": "implementing",
+          "actors": ["debugger", "implementer"],
+          "bounces": 1
+        },
+        {
+          "id": "qaPass",
+          "status": "qa",
+          "actors": ["qa"],
+          "bounces": 1
+        },
+        {
+          "id": "rejected",
+          "status": "judge",
+          "actors": ["judge"],
+          "bounces": 1
+        },
+        {
+          "id": "parked",
+          "status": "parked",
+          "actors": ["harness"],
+          "bounces": 2
+        },
+        {
+          "id": "reopen",
+          "status": "implementing",
+          "actors": ["human"],
+          "bounces": 0
+        }
+      ]
+    }
+  ]
+}

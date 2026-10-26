@@ -1,0 +1,164 @@
+## Nine roles, six stages
+
+A role is a Markdown file with a short frontmatter and a prompt. harness-demo ships nine of them. A role is not a
+column on the board: each stage's coordinator calls one or more roles inside its unit.
+
+| Stage (unit) | The coordinator calls                                  |
+| ------------ | ------------------------------------------------------ |
+| spec         | writer                                                 |
+| plan         | explorer, then planner                                 |
+| prototype    | designer                                               |
+| implement    | tester and implementer; after a bounce, debugger first |
+| qa           | qa                                                     |
+| judge        | judge                                                  |
+
+With `deliver.pr` on, a confirmed task gets one more step, and no role works it: the runner pushes the branch and
+opens the pull request itself. The [task lifecycle](/lifecycle) page describes it.
+
+## The roles
+
+Each card says what the role reads, what it writes, and which verdict token code expects from it.
+
+<Role id="writer" input="your draft" output="## Spec — goal, user story, constraints, out of scope; product questions">
+  Turns a two-line draft into a spec someone else could build from. When the draft leaves a product decision open, it asks you instead of
+  guessing.
+</Role>
+
+<Role id="explorer" input="the spec and the code" output="a map for the planner: files, call sites, existing tests, the test stack">
+  Cheap and read-only. It maps the part of the codebase the task touches, so the planner's `scope` and closing commands are measured instead
+  of guessed.
+</Role>
+
+<Role
+  id="planner"
+  input="the spec and the explorer's map"
+  output="## Plan — phases, files per phase, scope, gate, acceptance criteria; questions that come out of the code"
+>
+  Decides where the change goes and writes the contracts for the build: which files may change (`scope`), which command must pass (`gate`),
+  and how closure is proven.
+</Role>
+
+<Role id="designer" input="the plan of a ui task" output="## Prototype — a prototype route in the app and its screenshot, prototype.png">
+  Runs only for tasks with `kind: ui`. It builds a clickable prototype and stops. You accept it or leave a comment, and it goes another
+  round.
+</Role>
+
+<Role id="tester" input="the plan and its [closes] criteria" output="tests in the project's own stack, inside the scope">
+  Writes or updates the tests first, with the test runner, layout and helpers the project already has. This gives every `[closes]` criterion
+  something real to run.
+</Role>
+
+<Role id="implementer" input="the plan, its scope and the new tests" output="code inside the scope, nothing else">
+  Ships exactly what the plan says and never widens the scope. If the plan is wrong, it says so in the task file instead of quietly fixing
+  something else. The harness commits the tests and the code together after a green gate.
+</Role>
+
+<Role id="debugger" input="the qa or judge report of a bounced task" output="a diagnosis for the implementer">
+  Runs only when `bounces` is above zero. It finds the cause of the rejection and hands the implementer a diagnosis, so the next round is a
+  fix instead of a blind retry.
+</Role>
+
+<Role
+  id="qa"
+  input="the commit and the acceptance criteria"
+  output="screenshots and a report under .harness/artifacts/"
+  verdict="qa: PASS | FAIL | CANNOT_VERIFY"
+>
+  Runs the tests and walks every criterion on the running app. It is read-only: it never writes tests and never fixes code. "Cannot verify"
+  is an honest answer and parks the task for a human, which is better than a guess.
+</Role>
+
+<Role
+  id="judge"
+  input="the commit, the plan and the qa report"
+  output="a report under .harness/artifacts/"
+  verdict="judge: CONFIRMED | REJECTED"
+>
+  Adversarial and read-only. It re-runs every closing check itself and looks for reasons the work is not done. A task can only close with a
+  `CONFIRMED` judge.
+</Role>
+
+## Why the test author is not qa
+
+It looks tidy to let one role write the tests and also check the work. It is a trap.
+
+<Note title="Do not grade your own homework">
+  A role that writes the tests and then grades the work against them grades its own homework. Its tests encode its own understanding of the
+  task, so they pass exactly where it is already confident.
+</Note>
+
+So the tester works inside the implement unit, and qa stays read-only. The tests and the code land in one commit,
+and then two roles that wrote none of it check that commit. This also keeps one writing unit per round: a qa unit
+that could write would need its own commit and a wider scope contract.
+
+## Where each role stops
+
+The task file is split into sections, and every section has one owner. A role may write only its own section. The
+dashboard writes only what a human owns.
+
+| Section of the task file                    | Written by                                |
+| ------------------------------------------- | ----------------------------------------- |
+| `## Draft`                                  | you, in the dashboard                     |
+| `## Spec`                                   | writer                                    |
+| `## Questions` — the questions              | writer or planner                         |
+| `## Questions` — the answers                | you, through the picker on the card       |
+| `## Plan`, `## Acceptance criteria`         | planner                                   |
+| `## Prototype`                              | designer; you write the `### Review` part |
+| `title`, `kind`, `status` along human moves | you                                       |
+| `status` along agent moves, `## Log`        | the harness                               |
+
+Owned sections are why two writers never fight over one file: when the harness and the dashboard both touch a task,
+each one edits only its own region. Code and tests are not in the task file at all; the scope contract guards them.
+
+## Add a file, get a specialist
+
+The nine roles are a starting set, not a closed list. The harness merges two folders into one registry:
+
+- `agents/` in harness-demo — the base roles;
+- `<project>/.claude/agents/` in your project — your own specialists.
+
+A project agent with the same name as a base agent replaces it. For each unit, the runner keeps only the agents whose
+`stages:` include the unit's stage, writes them to `.harness/trace/unit-NNNN.agents.json`, and passes that file to
+Claude Code with `--agents`. Nothing is written into your project. The coordinator then picks the specialists the task
+needs.
+
+A new specialist is one new file. Besides the usual `name`, `description`, `model` and `tools`, its frontmatter says in which stages
+it may be called and when:
+
+```markdown
+---
+name: a11y
+description: Checks new UI against keyboard and screen-reader basics
+model: sonnet
+tools: Read, Grep, Glob
+stages: [qa]
+when: the task has kind ui
+---
+```
+
+Typical project specialists are a `triager` that splits a draft holding several tasks, an `a11y` check next to qa
+for ui tasks, and a `docs` writer that keeps the README and changelog in step, inside the scope.
+
+The contract fixes only the **required** verdicts for each stage, in the project's `config.json`: the qa unit
+needs a `qa:` token, the judge unit a `judge:` token. Any extra specialist is allowed.
+
+`harness agents` lists the merged registry, `harness agents --check` runs the drift and model checks, and
+`harness agents --sync` copies the standing rules into every base agent.
+
+## A model per role
+
+Each coordinator's model comes from `roles.models` in `config.json`. A specialist's model comes from its own
+frontmatter, and `roles.models.<name>` overrides it. The defaults put the implementer and the tester on `sonnet`, the
+judge on `opus`, and the explorer on `haiku`. Two rules sit behind those choices:
+
+- **Measure before you downgrade.** A cheaper model for the explorer or the writer may be fine; a cheaper
+  implementer may cost more in bounced rounds than it saves. Change one role at a time and compare.
+- **The judge is a different model from the implementer and the tester, on purpose.** A model reviewing its own
+  kind of output shares its blind spots. It finds the code plausible for the same reasons it wrote it. A different
+  model makes different mistakes, so it catches some of the ones the authors cannot see. This one is enforced: a judge
+  that shares a model with the implementer or the tester makes the runner exit with code 2, broken configuration.
+
+If two review units per task are too expensive, set `roles.mergeQaJudge: true`. The qa unit then also gets the judge
+specialist and its rubric. A qa PASS re-runs every `[closes]` command before the task moves to `done`, as a judge
+CONFIRMED would, and a red criterion turns the PASS into a bounce. The Judge column disappears. It is cheaper and
+weaker: the second unit with a fresh context is gone.

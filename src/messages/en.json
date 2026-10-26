@@ -1,0 +1,440 @@
+{
+  "site": {
+    "name": "harness info",
+    "description": "A step-by-step guide to running Claude Code unattended: what a harness is, the roles, how a coordinator delegates, the loop's contracts, and how to start, pause and stop it."
+  },
+  "nav": {
+    "overview": "Overview",
+    "guide": "Guide",
+    "github": "GitHub",
+    "menu": "Menu",
+    "close": "Close menu",
+    "language": "Language",
+    "skip": "Skip to content",
+    "demo": "Demo",
+    "demoTip": "Demo repo on GitHub",
+    "githubTip": "This site's code",
+    "chaptersMeta": "8 chapters · ~45 min",
+    "here": "you are here",
+    "whereAmI": "Where you are",
+    "siteNav": "Site sections",
+    "guideNav": "Guide chapters",
+    "chaptersButton": "Chapters · 7"
+  },
+  "pages": {
+    "concepts": {
+      "title": "Concepts",
+      "goal": "Learn the eight words the rest of this guide is built on."
+    },
+    "roles": {
+      "title": "Roles",
+      "goal": "Know who does what in a run, and why the judge is a different model."
+    },
+    "coordination": {
+      "title": "Coordination",
+      "goal": "See how one coordinator hands a task to specialists and collects their verdicts."
+    },
+    "lifecycle": {
+      "title": "Task lifecycle",
+      "goal": "Follow one task from a two-line draft to a delivered commit."
+    },
+    "loop": {
+      "title": "Running the loop",
+      "goal": "Start, pause, resume and stop a loop, and read its exit codes."
+    },
+    "contracts": {
+      "title": "Contracts",
+      "goal": "Learn the checks that let you trust a run you did not watch."
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "goal": "Know where each thing lives in the dashboard and what you can press there."
+    },
+    "lessons": {
+      "title": "Lessons",
+      "goal": "Skip the expensive mistakes that were already made once."
+    }
+  },
+  "doc": {
+    "onThisPage": "On this page",
+    "previous": "Previous",
+    "next": "Next",
+    "copy": "Copy",
+    "copied": "Copied",
+    "roleIn": "Reads",
+    "roleOut": "Writes",
+    "roleVerdict": "Verdict",
+    "chapterOf": "Chapter {n} of {total}",
+    "goalTitle": "Page goal",
+    "goalShort": "Goal",
+    "nextLabel": "Next",
+    "nextTo": "Next: {title}",
+    "backTo": "Back: {title}",
+    "beforeFirst": "before chapter 1 of {total}",
+    "startHere": "Start here",
+    "openFirst": "Open chapter 1",
+    "dockLabel": "Where you are and what is next",
+    "prevChapter": "Back · chapter {n} of {total}",
+    "nextChapter": "Next · chapter {n} of {total}"
+  },
+  "home": {
+    "title": "A harness runs Claude Code unattended",
+    "lead": "A harness is a small program around Claude Code. It gives the agent one unit of work at a time, checks the result with code instead of taking the agent's word, and keeps all its state in files. A run can go for hours, and you can pause it at any moment.",
+    "primary": "Start with the concepts",
+    "secondary": "Open the demo repo",
+    "flowTitle": "One task, thirteen columns",
+    "flowLead": "You write a two-line draft. Agents turn it into a spec, a plan, code, a review and a commit. You step in only where a human decision is needed.",
+    "human": "you",
+    "agent": "agent",
+    "nobody": "end",
+    "readTitle": "Read it in this order",
+    "readLead": "Eight pages, about forty-five minutes. Each one has a single goal, stated at the top.",
+    "goal": "Understand what a harness is and pick where to start.",
+    "tocWhat": "What a harness is"
+  },
+  "notFound": {
+    "title": "This page does not exist",
+    "back": "Back to the overview"
+  },
+  "diagrams": {
+    "controls": {
+      "prev": "Previous step",
+      "next": "Next step",
+      "play": "Play",
+      "pause": "Pause",
+      "replay": "Replay",
+      "goTo": "Step {n} of {total}",
+      "scenario": "Scenario"
+    },
+    "actors": {
+      "human": "you",
+      "harness": "harness",
+      "none": "nobody",
+      "youPill": "You"
+    },
+    "flow": {
+      "label": "One task moving across the board",
+      "scenarios": {
+        "logic": "Logic task",
+        "ui": "UI task",
+        "bounce": "Bounce"
+      },
+      "bounces": "bounces {n}",
+      "steps": {
+        "logic": {
+          "draft": "You create T-002, \"Do not add the same URL twice\", with a title and two lines of draft, then press Submit.",
+          "spec": "The spec unit starts. The writer turns the draft into a spec and finds nothing to ask, so the harness moves the card on.",
+          "plan": "The plan unit: the explorer maps the code and the existing tests, then the planner writes the phases, the scope, the gate and one [closes] criterion.",
+          "planned": "The plan waits for you. You approve it, and because this is a logic task, it skips the prototype.",
+          "ready": "Approved and waiting. The next unit picks it up.",
+          "implementing": "The implement unit: the harness creates the branch harness/T-002-…, the tester writes the test and the implementer the code. The gate is green, so the harness commits.",
+          "qa": "The qa unit runs the tests, walks the criteria on the running app and prints qa: PASS.",
+          "judge": "The judge unit, a different model, re-runs the [closes] command and looks for a reason to reject. It prints judge: CONFIRMED.",
+          "done": "Confirmed. Without PR delivery, the commit on the task branch is the delivery, and the card stays here.",
+          "delivered": "With deliver.pr: true, the runner pushes the branch and opens a pull request itself: no agent, no tokens. A human merges it."
+        },
+        "ui": {
+          "draft": "You create T-001 with kind ui: a search box that filters the bookmark list.",
+          "spec": "The writer starts the spec and hits a product decision it should not guess.",
+          "ask": "It writes Q1 with three options, the recommended one first, and ends the unit. The card waits for you.",
+          "answer": "You pick an option on the card. No question is open any more, so the harness sends the task back to spec.",
+          "plan": "The spec is finished. The explorer maps the list component, and the planner writes the plan with the prototype route in its scope.",
+          "planned": "You approve the plan. A ui task goes to the prototype step first.",
+          "drafting": "The designer builds a clickable prototype and takes a screenshot. The card shows drafting.",
+          "comment": "The prototype is in review. You leave a comment, and the designer goes another round.",
+          "accept": "The second round looks right. You press Accept.",
+          "ready": "Approved and waiting for the implement unit.",
+          "implementing": "The tester writes the test for the filter and the implementer the code. The gate is green: one commit.",
+          "qa": "qa types into the search box, checks the list and an empty search, and prints qa: PASS.",
+          "judge": "The judge re-runs the closing checks and prints judge: CONFIRMED.",
+          "done": "Done. The prototype route is dropped at delivery unless the plan keeps it."
+        },
+        "bounce": {
+          "ready": "T-002 is approved with bounces: 0 in its frontmatter. The cap, limits.bounces, is 2.",
+          "round1": "Round 1: the tester and the implementer ship the change, and the harness commits it.",
+          "qaFail": "qa finds a criterion that fails and prints qa: FAIL. The task goes back, and bounces becomes 1.",
+          "round2": "Round 2 starts with the debugger: it reads the qa report and hands the implementer a diagnosis. A second commit.",
+          "qaPass": "This time qa passes.",
+          "rejected": "The judge rejects the work. That rejection brings bounces to 2, which is the cap.",
+          "parked": "So the task is not sent back again. It is parked for a human, with the reason in its frontmatter.",
+          "reopen": "You read the reason and press Reopen once the cause is dealt with. bounces goes back to 0, and the task returns to implementing."
+        }
+      }
+    },
+    "sequence": {
+      "label": "One unit as a sequence of messages",
+      "scenarios": {
+        "implement": "Implement unit",
+        "hold": "qa holds the turn",
+        "early": "qa ends the turn early"
+      },
+      "lifelines": {
+        "runner": "runner",
+        "coordinator": "coordinator"
+      },
+      "labels": {
+        "implement": {
+          "prepare": "pick · branch · snapshot",
+          "start": "claude -p",
+          "tester": "write the test",
+          "testerDone": "test ready",
+          "implementer": "make it pass",
+          "hold": "hold the turn",
+          "implementerDone": "code ready",
+          "finish": "final message · exit 0",
+          "contracts": "scope ✓ task file ✓ gate ✓",
+          "commit": "commit · → qa"
+        },
+        "hold": {
+          "prepare": "pick · snapshot",
+          "start": "claude -p",
+          "dispatch": "walk the criteria",
+          "hold": "hold the turn",
+          "report": "all criteria met",
+          "finish": "qa: PASS · exit 0",
+          "contracts": "scope ✓ task file ✓ trace ✓",
+          "move": "→ judge"
+        },
+        "early": {
+          "prepare": "pick · snapshot",
+          "start": "claude -p",
+          "dispatch": "walk the criteria",
+          "early": "“Waiting…” · exit",
+          "lost": "report → nobody",
+          "trace": "trace ✗ no qa: line",
+          "park": "quarantine · → parked"
+        }
+      },
+      "steps": {
+        "implement": {
+          "prepare": "The runner picks T-002 in implementing, switches to its branch and takes a snapshot of the tree.",
+          "start": "It starts the coordinator: claude -p with the implement prompt, the standing rules and ## This run.",
+          "tester": "The coordinator calls the tester first: write the test for the [closes] criterion, in the project's own stack.",
+          "testerDone": "The tester reports back with the new test.",
+          "implementer": "Then the implementer: make the test pass, inside the scope.",
+          "hold": "The call is asynchronous, so the coordinator holds the turn. It keeps making tool calls, reading the trace and the task file, instead of writing a final message.",
+          "implementerDone": "The implementer reports back.",
+          "finish": "Only now does the coordinator write its final message and exit.",
+          "contracts": "The runner checks the unit: scope, task file, gate. The implement stage needs no verdict line.",
+          "commit": "Everything is green. The runner commits the tests and the code together and moves the task to qa."
+        },
+        "hold": {
+          "prepare": "The runner picks T-002 in qa and takes a snapshot.",
+          "start": "It starts a fresh coordinator with the qa prompt.",
+          "dispatch": "The coordinator calls qa: run the tests and walk the criteria on the running app.",
+          "hold": "It holds the turn with tool calls while qa works.",
+          "report": "qa reports that every criterion is met.",
+          "finish": "The coordinator prints the line qa: PASS and exits.",
+          "contracts": "The runner checks scope (only .harness/artifacts/ was written), the task file and the trace. The qa: line is there.",
+          "move": "The task moves to judge."
+        },
+        "early": {
+          "prepare": "The runner picks T-002 in qa and takes a snapshot.",
+          "start": "It starts a fresh coordinator with the qa prompt.",
+          "dispatch": "The coordinator calls qa: run the tests and walk the criteria on the running app.",
+          "early": "The coordinator writes “Waiting for the results”. A message without a tool call ends the turn, and claude -p exits.",
+          "lost": "qa's answer has nobody left to receive it.",
+          "trace": "The runner finds no qa: line in the unit's output. The trace contract fails: a hard stop, exit code 1.",
+          "park": "The unit's changes go into the stash “harness quarantine: T-002 unit N”, the tree is restored, and the task is parked with the reason."
+        }
+      }
+    },
+    "loop": {
+      "label": "The loop: supervisor, runner, coordinator, specialists and contracts",
+      "scenarios": {
+        "normal": "Normal run",
+        "pause": "Pause",
+        "hardstop": "Hard stop",
+        "usage": "Usage limit",
+        "stop": "Stop"
+      },
+      "layers": {
+        "supervisor": "supervisor",
+        "runner": "runner",
+        "coordinator": "coordinator",
+        "specialists": "specialists",
+        "contracts": "contracts"
+      },
+      "layerNotes": {
+        "supervisor": "the whole run",
+        "runner": "one unit",
+        "coordinator": "claude -p",
+        "specialists": "one job each",
+        "contracts": "code checks"
+      },
+      "states": {
+        "running": "running",
+        "paused": "paused",
+        "waiting": "waiting for the agent",
+        "idle": "idle, polling",
+        "stopped": "stopped"
+      },
+      "units": "Units",
+      "unit": "unit {n}",
+      "running": "running",
+      "steps": {
+        "normal": {
+          "lock": "harness run starts the supervisor. It takes the lock .harness/trace/supervisor.lock, so a second loop on this checkout refuses to start.",
+          "pick": "The runner starts unit 1. It picks T-002 in spec, records it in running.json, and writes the stage's specialists to unit-0001.agents.json.",
+          "work": "The coordinator and the writer work in a fresh claude -p. Every output line goes to unit-0001.jsonl.",
+          "check": "The coordinator exits. The runner checks the contracts, moves T-002 to plan, appends a handoff, and exits with code 0.",
+          "next": "Unit 2 picks the same task in plan. One unit moves a task one step, and every step gets a fresh context.",
+          "idle": "Nothing is left to take, so the runner exits with code 3. The supervisor checks for new work every 30 seconds. With --once-through it would end the run here."
+        },
+        "pause": {
+          "run": "Unit 4 is working on T-003 in implement.",
+          "write": "You run harness pause. It writes .harness/trace/PAUSE. The unit in flight does not notice and keeps working.",
+          "finish": "The unit finishes, its contracts run, and the runner exits with code 0.",
+          "wait": "At the unit boundary the supervisor finds PAUSE and waits, checking the file every 2 seconds. Nothing is in flight: a safe moment to edit and commit.",
+          "resume": "harness resume deletes PAUSE, and the next unit starts."
+        },
+        "hardstop": {
+          "run": "Unit 7: the implementer works on T-004.",
+          "stray": "It also edits a file outside the task's scope.",
+          "scope": "The scope contract compares the tree with the snapshot and finds the stray file. A hard stop: exit code 1.",
+          "stash": "The runner moves the unit's changes into the stash harness quarantine: T-004 unit 7, restores the tree, and parks T-004 with the reason.",
+          "next": "The supervisor goes on with the next unit, on a clean tree."
+        },
+        "usage": {
+          "start": "Unit 9 starts claude -p for T-005.",
+          "refused": "The agent is refused because the usage limit is reached. The runner puts the tree back and exits with code 4. T-005 is untouched.",
+          "probe": "The supervisor waits. It probes the network every 30 seconds; the network is fine, so it naps for 30 minutes. After six hours of this it would give up and exit with code 4.",
+          "retry": "It tries again with the same task. This time the agent runs, and the unit ends with code 0."
+        },
+        "stop": {
+          "run": "Unit 11 is working on T-006 in qa.",
+          "write": "You run harness stop. It writes .harness/trace/STOP. The unit keeps going.",
+          "finish": "The unit finishes, and its contracts run.",
+          "exit": "At the boundary the supervisor finds STOP, exits with code 0 and removes its lock. STOP stays until the next run starts and clears it."
+        }
+      }
+    },
+    "states": {
+      "label": "The task state machine",
+      "legendHuman": "a human move (the dashboard and the CLI offer only these)",
+      "legendAgent": "a move the harness makes after a unit, in the colour of the stage's role",
+      "legendPark": "park: a hard stop, from any unfinished status",
+      "byHuman": "by you",
+      "byAgent": "by the harness",
+      "reopen": "the status it was parked from, by you",
+      "park": "on a hard stop: scope, task file, trace, gate, an agent error or a timeout",
+      "guards": {
+        "noQuestions": "when no question is open",
+        "ui": "kind: ui",
+        "notUi": "any other kind",
+        "full": "only with autonomy.mode: full",
+        "drafting": "when the designer finishes a round",
+        "review": "while the prototype is in review",
+        "notMerge": "without merged review",
+        "merge": "with roles.mergeQaJudge, after every [closes] passes",
+        "underCap": "while bounces + 1 < limits.bounces",
+        "atCap": "when this rejection reaches limits.bounces"
+      },
+      "what": {
+        "draft": "You write the title and a few lines. Nothing runs until you submit it.",
+        "spec": "The spec unit: the writer turns the draft into a spec, or asks a product question.",
+        "needs-input": "Waiting for your answers. The harness returns the task to the stage in resume once no question is open.",
+        "plan": "The plan unit: the explorer maps the code, the planner writes phases, scope, gate and criteria, or asks.",
+        "planned": "The plan waits for your approval. Full autonomy skips this gate.",
+        "prototype": "The designer drafts a prototype; then it waits in review for your Accept or Comment.",
+        "ready": "Approved and waiting for the implement unit.",
+        "implementing": "The implement unit: the tester and the implementer, with the debugger first after a bounce. The harness commits after a green gate.",
+        "qa": "The qa unit runs the tests and walks the criteria on the running app. Read-only.",
+        "judge": "The judge unit, a different model, re-runs every [closes] and tries to reject.",
+        "done": "Confirmed. With deliver.pr on, the runner's delivery step comes next.",
+        "delivered": "The branch is pushed and the pull request is open. A human merges it.",
+        "parked": "Stopped with a reason in the frontmatter. Only you can reopen it."
+      }
+    }
+  },
+  "shots": {
+    "open": "Open full size",
+    "close": "Close",
+    "legend": "What the numbers mark",
+    "more": "Walkthrough on the Dashboard page",
+    "projects": {
+      "alt": "The Projects screen of the dashboard with the bookmarks project and the Add a project form.",
+      "caption": "Projects: every repository the harness knows.",
+      "markers": {
+        "cli": "The terminal does the same: <code>harness projects add</code> and <code>harness example</code>.",
+        "row": "One project: its tasks, how many of them wait for you, and the unit in flight (T-001 in qa).",
+        "open": "Open board goes to the project's board. Remove asks you to confirm.",
+        "add": "Add a project takes any local git repository. The loop creates <code>.harness/</code> in it and touches nothing else until you submit a task."
+      }
+    },
+    "board": {
+      "alt": "The board of the bookmarks project during a qa unit, with the Live dock on the right.",
+      "caption": "The board while the loop runs: a qa unit checks T-001.",
+      "markers": {
+        "waiting": "The header counts the tasks that wait for you and says why each one waits.",
+        "groups": "Thirteen columns in five groups: Define, Plan, Build, Review, Finish. An empty column folds into a narrow rail.",
+        "action": "A card shows its stage track. When the card waits for you, it shows one action: Submit, Answer, Approve, Review or Reopen.",
+        "running": "The spinner marks the card a unit works on right now. At most one card has it.",
+        "parked": "A card in <code>parked</code> names the contract that stopped it: here a file, README.md, changed outside the task's scope.",
+        "dock": "The Live dock: the supervisor with Pause and Stop, the unit in flight, what comes next and the recent units."
+      }
+    },
+    "task-questions": {
+      "alt": "The task drawer of T-003 with the writer's two questions and their lettered options.",
+      "caption": "A task in needs-input: the writer asks two questions.",
+      "markers": {
+        "card": "The task you opened stays outlined on the board.",
+        "asker": "Who asked and when: the writer, in the spec stage, in unit 5.",
+        "tabs": "The task file in tabs. Interview appears only when the task has questions.",
+        "options": "Each question has lettered options. The recommended one comes first, with its reason.",
+        "note": "An optional note for the agent goes with each answer.",
+        "send": "One button writes all the answers into the task file.",
+        "draft": "Your own draft stays at the bottom of the drawer."
+      }
+    },
+    "prototype-review": {
+      "alt": "The task drawer of T-001 on the Prototype tab, with Accept, a comment box and the round's picture.",
+      "caption": "A UI task in prototype: round 1 waits for your review.",
+      "markers": {
+        "card": "T-001 is a UI task, so it stops in Prototype before it is built. The card shows the round and asks you to Review.",
+        "tab": "The Prototype tab appears for UI tasks.",
+        "accept": "Accept moves the task to <code>ready</code>.",
+        "comment": "Or write what the next round should change. The drawer shows how many rounds are left.",
+        "preview": "The round's picture from the task's artifacts folder: the designer's <code>prototype.png</code> (a screenshot) or <code>prototype.svg</code> (a wireframe). In this walkthrough the fake agent drew an SVG.",
+        "draft": "Your draft, to compare the picture with what you asked for."
+      }
+    },
+    "live": {
+      "alt": "The Live trace screen: the unit list, the running qa unit with its agents, and the supervisor log.",
+      "caption": "Live trace during unit 12. Durations are real; the costs are demo numbers.",
+      "markers": {
+        "units": "Every unit the loop ran, newest first. The top one runs now.",
+        "hardstop": "Unit 8 ended in a hard stop, and T-004 went to <code>parked</code>.",
+        "header": "The unit in flight: its task, its stage, how long it has run and the specialists it may call.",
+        "coordinator": "The coordinator's lane: it handed the work to qa.",
+        "specialist": "The specialist's lane: each tool call with its time and the file name. Tool arguments and messages are never shown.",
+        "log": "The supervisor's log, newest first: starts, exit codes, status moves and commits."
+      }
+    },
+    "stats": {
+      "alt": "The Stats screen: totals, costs per stage and per task, verdicts and permission denials.",
+      "caption": "Stats after the walkthrough. The tokens and costs are made up by the fake agent.",
+      "markers": {
+        "tiles": "Totals: units, cost, tokens, agent time and denied tool calls.",
+        "unknown": "A unit whose agent printed no usage counts as unknown, not as zero.",
+        "stage": "Per stage, with its coordinator, the parked count and a bar for cost.",
+        "task": "Per task, with its current status.",
+        "verdicts": "The verdicts the coordinators printed: qa PASS, judge CONFIRMED.",
+        "denials": "Tool calls the permission mode refused. Frequent ones point to a missing entry in <code>agent.allowedTools</code>."
+      }
+    },
+    "agents": {
+      "alt": "The Agents screen: the stage coordinators, the specialist matrix, the checks and the invocation.",
+      "caption": "Agents: who works each stage and how a unit starts Claude Code.",
+      "markers": {
+        "coordinators": "One coordinator per stage, each one <code>claude -p</code> on its model. The judge runs on opus.",
+        "matrix": "The specialists each unit gets through <code>--agents</code>. A dot marks the stage that offers one.",
+        "pill": "The checks that refuse a run, summed up.",
+        "checks": "The checks: the judge's model differs from the implementer's and the tester's, and every agent carries the current standing rules.",
+        "invocation": "How a unit starts Claude Code. This orange card appears only because <code>AGENT_CMD</code> points at the fake agent; a real project shows the plain <code>claude</code> command.",
+        "integrations": "Delivery and Telegram, both off here. Delivery needs <code>deliver.pr</code>; Telegram needs <code>TELEGRAM_BOT_TOKEN</code> and <code>TELEGRAM_CHAT_ID</code>.",
+        "tools": "Permission mode, setting sources and allowed tools. Commits and pushes are absent on purpose: the loop commits only after the contracts pass."
+      }
+    }
+  }
+}

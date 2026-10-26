@@ -1,0 +1,76 @@
+/* Fonts resolve on <body>, where next/font sets the variables, so they must stay inline. */
+@theme inline {
+  --font-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* The D3 "Command center" look of the harness-demo dashboard, shared by this site. */
+@theme {
+  /* Surfaces */
+  --color-ground: #0d0d0d;
+  --color-rail: #090909;
+  --color-surface: #131313;
+  --color-surface-2: #1b1b1b;
+  --color-surface-3: #262626;
+  --color-lane: #111111;
+  --color-card: #171717;
+  --color-card-run: #1d1613;
+  --color-line: #2e2e2e;
+  --color-line-soft: #1d1d1d;
+
+  /* Text */
+  --color-ink: #efefef;
+  --color-ink-soft: #c4c4c4;
+  --color-ink-mute: #9e9e9e;
+  --color-faint: #616161;
+
+  /* The one accent: actions and "you are here" */
+  --color-accent: #d97757;
+  --color-accent-hover: #e3876a;
+  --color-accent-ink: #0d0d0d;
+  --color-accent-soft: rgb(217 119 87 / 0.14);
+  --color-accent-line: rgb(217 119 87 / 0.5);
+
+  /* Progress tracks */
+  --color-track: #262626;
+  --color-track-past: #666666;
+
+  /* One colour per role: the letters of the dashboard's monogram, hsl(h 75% 76%) */
+  --color-role-writer: hsl(215 75% 76%);
+  --color-role-explorer: hsl(185 75% 76%);
+  --color-role-planner: hsl(160 75% 76%);
+  --color-role-designer: hsl(315 75% 76%);
+  --color-role-tester: hsl(48 75% 76%);
+  --color-role-implementer: hsl(130 75% 76%);
+  --color-role-debugger: hsl(22 75% 76%);
+  --color-role-qa: hsl(95 75% 76%);
+  --color-role-judge: hsl(350 75% 76%);
+  --color-human: #ffffff;
+
+  /* A failed contract */
+  --color-danger: #ff6170;
+
+  /* Radii */
+  --radius-panel: 10px;
+  --radius-card: 8px;
+  --radius-btn: 7px;
+
+  /* Layout */
+  --spacing-page-x: 1rem;
+  --rail-w: 76px;
+  --nav-w: 240px;
+  --dock-w: 292px;
+}
+
+@media (width >= 48rem) {
+  :root {
+    --spacing-page-x: 1.5rem;
+  }
+}
+
+@media (width < 77.5rem) {
+  :root {
+    --rail-w: 60px;
+    --nav-w: 228px;
+  }
+}

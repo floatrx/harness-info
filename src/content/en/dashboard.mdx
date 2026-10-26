@@ -1,0 +1,57 @@
+<Note title="About these screenshots">
+  They come from harness-demo's own walkthrough: a throwaway copy of the bookmarks example, driven by the fake agent. That is why the header
+  shows a `/tmp/harness-e2e-…` path. Durations are real. Tokens and costs are made up by the fake agent, so read them as demo numbers.
+</Note>
+
+## Open it
+
+In the harness-demo checkout, run:
+
+```bash
+pnpm dashboard
+```
+
+Then open `http://127.0.0.1:4777`. The dashboard listens on 127.0.0.1 only. Its buttons write the same files as the
+CLI, so you can use both side by side. What Start, Pause, Resume and Stop do is on [Running the loop](/loop).
+
+## Projects
+
+The first screen lists every project the harness knows. A project is a local git repository the loop works in.
+
+<Shot name="projects" eager />
+
+## Board
+
+One board per project. Each column is a task status, and each card is a task. **New task** opens a two-line draft.
+
+<Shot name="board" />
+
+## A task: the interview
+
+Click a card to open its drawer. A task in `needs-input` opens on the Interview tab, with the questions an agent asked.
+
+<Shot name="task-questions" />
+
+## A task: the prototype
+
+A task with `kind: ui` stops in `prototype` before it is built, and the drawer opens on the Prototype tab.
+
+<Shot name="prototype-review" />
+
+## Live
+
+Live trace shows what a unit does while it runs, and what every earlier unit did.
+
+<Shot name="live" />
+
+## Stats
+
+Stats adds up the usage each unit reported, per stage and per task.
+
+<Shot name="stats" />
+
+## Agents
+
+Agents shows who works each stage and how a unit starts Claude Code, so you can check a setup before a run.
+
+<Shot name="agents" />

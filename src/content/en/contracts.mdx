@@ -1,0 +1,149 @@
+## Told to the agent, enforced by code
+
+A contract is a rule the agent is told about and code checks anyway. The point is not that the agent is careless. The
+point is that you were not watching, so the only things you can trust afterwards are the ones a program verified.
+
+| Contract              | The question it answers                                                        | When it fails               |
+| --------------------- | ------------------------------------------------------------------------------ | --------------------------- |
+| scope                 | Did the unit touch only what it was allowed to?                                | hard stop, task parked      |
+| gate                  | Does the project still pass its checks, as far as this change is concerned?    | hard stop, task parked      |
+| task file             | Did each role write only the sections it owns?                                 | hard stop, task parked      |
+| trace                 | Did the unit print the verdict its stage requires?                             | hard stop, task parked      |
+| closing               | Is each closing criterion actually true, according to code?                    | the task does not close     |
+| bounce cap            | Have implementer and reviewers disagreed too often?                            | task parked for a human     |
+| one loop per checkout | Is another loop already running here?                                          | the loop refuses to start   |
+| standing rules        | Does every agent file carry the current shared rules?                          | the runner exits 2          |
+| model split           | Is the judge on a different model from the implementer and the tester?         | the runner exits 2          |
+| branch                | Before a push: is the task branch there, ahead of base, every commit `T-NNN:`? | task parked, nothing pushed |
+| probe                 | Is the environment up?                                                         | exit 4, task untouched      |
+
+A **hard stop** ends the unit with exit code 1 and keeps the evidence. It fires on a failed scope, task-file, trace or
+gate check, when the agent exits with an error, or when a unit runs longer than `limits.unitTimeoutMinutes` (60 by
+default). The runner moves the unit's changes into a named
+`git stash`, `harness quarantine: T-NNN unit N`, restores the working tree, and parks the task with the reason. The
+next unit starts on a clean tree, and you can look at exactly what the agent did. A usage limit is not a hard stop: the
+unit ends with exit code 4 and the tree is put back as it was.
+
+## Scope
+
+The planner writes the scope into the task: a list of paths the implementer may change. For T-002 in the example
+project, "Do not add the same URL twice", a planner might write this (an illustration, not the output of a real run):
+
+```yaml
+scope:
+  - src/lib/bookmarks.ts
+  - src/lib/bookmarks.test.ts
+```
+
+After an implement unit, the runner checks that:
+
+- the branch is still the task branch, and its upstream has not moved;
+- the unit made no more commits than allowed;
+- every committed file and every newly dirty file is inside `scope`.
+
+The qa, judge and prototype units are read-only. They may write only under `.harness/artifacts/T-NNN/`. A file
+anywhere else fails the unit.
+
+A second fence stands behind this one: the agent's tool allowlist (`agent.allowedTools`) has no git commit and no push.
+Only the runner commits.
+
+## Gate, and why narrowing matters
+
+The gate is the command that must pass: the task's `gate:` plus the project default, usually types, lint and tests.
+
+```yaml
+gate: pnpm typecheck && pnpm test
+```
+
+A plain gate has a trap. Your project already has some lint warnings and one flaky test. The unit changes the bookmark logic and
+the gate fails on a file it never touched. Now the loop parks good work, again and again, for a defect it did not
+cause.
+
+So the gate is **narrowed** to the change:
+
+- lint owns only the lines the diff changed;
+- a test that fails is re-run at the unit's starting commit, in a throwaway worktree. If it fails there too, the defect
+  was already there, and this unit is not blamed for it.
+
+<Note title="The most expensive bug">
+  A check that fails a unit for a defect the unit did not cause is the single most expensive mistake a harness can make. It stops all
+  progress and looks exactly like the agent being bad at its job.
+</Note>
+
+## Task file
+
+The task file is split into sections, and each role owns some of them. The runner parses the file before and after the
+unit and compares them. A role that wrote outside its own sections, or left the file unparseable, causes a hard stop.
+The [roles](/roles) page lists who owns which section.
+
+## Trace
+
+The runner writes the stream-json output of every unit to `trace/unit-NNNN.jsonl`. The trace contract reads the verdict
+from the final `result` event, which is the coordinator's own last word. A specialist's verdict quoted inside a tool
+result does not count.
+`config.json` lists the verdicts each stage requires: the qa unit needs `qa: PASS`, `qa: FAIL` or
+`qa: CANNOT_VERIFY`, the judge unit needs `judge: CONFIRMED` or `judge: REJECTED`.
+
+No required verdict, no progress. And a task can only close with a `CONFIRMED` judge in its trace. This is also what
+catches the coordinator that [ended its turn too early](/coordination).
+
+## Executable closing
+
+An agent saying "done" proves nothing. The closing contract turns the most important acceptance criteria into
+commands that code runs.
+
+Every criterion is tagged:
+
+- **`[closes]`** — a shell command. The runner runs it; exit code 0 means the criterion is met. Only these decide
+  whether the task closes.
+- **`[found]`** — something a reviewer checks and reports, such as behaviour in the running app.
+- **`[process]`** — something a human does, such as a design review.
+
+Continuing the T-002 illustration:
+
+```markdown
+## Acceptance criteria
+
+1. **[closes]** `node --test src/lib/bookmarks.test.ts` exits 0
+2. **[found]** adding a URL that is already in the list keeps the old bookmark and tells the user
+3. **[process]** a human reads the message wording
+```
+
+The tag works with or without bold; `**[closes]**` is the canonical form. Aim for one `[closes]` per task. The [first lesson](/lessons) explains why more is worse.
+
+## Bounce cap
+
+qa FAIL and judge REJECTED share the counter `bounces` in the task's frontmatter. The rejection that brings it to
+`limits.bounces`, 2 by default, parks the task with the reason instead of sending it back to the implementer. With the
+default that means at most two implement rounds and two commits. `qa: CANNOT_VERIFY` parks the task too, but it is not
+a bounce. **Reopen** sets `bounces` back to 0.
+
+## One loop per checkout
+
+The scope contract diffs the whole working tree, so two loops in one checkout would blame each other's changes. The
+supervisor holds `.harness/trace/supervisor.lock` and a second loop refuses to start.
+
+## Standing rules
+
+Some rules every agent needs, whatever its role. They live in one file, `harness/prompts/STANDING-RULES.md`, and
+`harness agents --sync` copies them between markers into every base agent. A project agent without the block gets it
+added. Before a unit, the runner compares every copy with the source. A drifted copy makes it exit with code 2,
+broken configuration, so no agent runs on outdated rules.
+
+## Model split
+
+The judge must run on a different model from the implementer and the tester, for the reason the [roles](/roles) page
+gives. The runner checks the configured models before a unit and exits with code 2 when they match.
+
+## Branch
+
+Only when `deliver.pr` is on. Before it pushes anything, the runner checks that the task branch exists, that it is
+ahead of the base branch, and that every commit subject on it starts with `T-NNN:`, the sign that the harness made it.
+A failed check parks the task with `parked: deliver: branch contract: …`, and nothing is pushed. The
+[task lifecycle](/lifecycle) page describes the whole delivery step.
+
+## Environment probe
+
+A project can set a `probe:` command in `config.json`. If the environment is down, the unit ends with exit code 4
+before the agent starts, and the task stays as it was. Without a probe, an agent would spend a unit discovering that
+the database is not running.

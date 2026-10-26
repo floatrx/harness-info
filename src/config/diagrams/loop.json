@@ -1,0 +1,386 @@
+{
+  "scenarios": [
+    {
+      "id": "normal",
+      "steps": [
+        {
+          "id": "lock",
+          "layer": "supervisor",
+          "state": "running",
+          "files": ["supervisor.lock"],
+          "units": []
+        },
+        {
+          "id": "pick",
+          "layer": "runner",
+          "state": "running",
+          "files": ["supervisor.lock", "running.json", "unit-seq", "unit-0001.agents.json"],
+          "units": [
+            {
+              "n": 1,
+              "task": "T-002",
+              "stage": "spec"
+            }
+          ]
+        },
+        {
+          "id": "work",
+          "layer": "specialists",
+          "state": "running",
+          "files": ["supervisor.lock", "running.json", "unit-seq", "unit-0001.agents.json", "unit-0001.jsonl"],
+          "units": [
+            {
+              "n": 1,
+              "task": "T-002",
+              "stage": "spec"
+            }
+          ]
+        },
+        {
+          "id": "check",
+          "layer": "contracts",
+          "state": "running",
+          "files": ["supervisor.lock", "running.json", "unit-seq", "unit-0001.agents.json", "unit-0001.jsonl", "handoffs.jsonl"],
+          "units": [
+            {
+              "n": 1,
+              "task": "T-002",
+              "stage": "spec",
+              "code": 0
+            }
+          ]
+        },
+        {
+          "id": "next",
+          "layer": "runner",
+          "state": "running",
+          "files": ["supervisor.lock", "running.json", "unit-seq", "unit-0002.agents.json", "unit-0002.jsonl", "handoffs.jsonl"],
+          "units": [
+            {
+              "n": 1,
+              "task": "T-002",
+              "stage": "spec",
+              "code": 0
+            },
+            {
+              "n": 2,
+              "task": "T-002",
+              "stage": "plan"
+            }
+          ]
+        },
+        {
+          "id": "idle",
+          "layer": "supervisor",
+          "state": "idle",
+          "files": ["supervisor.lock", "unit-seq", "handoffs.jsonl"],
+          "units": [
+            {
+              "n": 1,
+              "task": "T-002",
+              "stage": "spec",
+              "code": 0
+            },
+            {
+              "n": 2,
+              "task": "T-002",
+              "stage": "plan",
+              "code": 0
+            },
+            {
+              "n": 3,
+              "task": "—",
+              "stage": "—",
+              "code": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pause",
+      "steps": [
+        {
+          "id": "run",
+          "layer": "specialists",
+          "state": "running",
+          "files": ["supervisor.lock", "running.json"],
+          "units": [
+            {
+              "n": 4,
+              "task": "T-003",
+              "stage": "implement"
+            }
+          ]
+        },
+        {
+          "id": "write",
+          "layer": "specialists",
+          "state": "running",
+          "files": ["supervisor.lock", "running.json", "PAUSE"],
+          "units": [
+            {
+              "n": 4,
+              "task": "T-003",
+              "stage": "implement"
+            }
+          ]
+        },
+        {
+          "id": "finish",
+          "layer": "contracts",
+          "state": "running",
+          "files": ["supervisor.lock", "running.json", "PAUSE"],
+          "units": [
+            {
+              "n": 4,
+              "task": "T-003",
+              "stage": "implement",
+              "code": 0
+            }
+          ]
+        },
+        {
+          "id": "wait",
+          "layer": "supervisor",
+          "state": "paused",
+          "files": ["supervisor.lock", "PAUSE"],
+          "units": [
+            {
+              "n": 4,
+              "task": "T-003",
+              "stage": "implement",
+              "code": 0
+            }
+          ]
+        },
+        {
+          "id": "resume",
+          "layer": "runner",
+          "state": "running",
+          "files": ["supervisor.lock", "running.json"],
+          "units": [
+            {
+              "n": 4,
+              "task": "T-003",
+              "stage": "implement",
+              "code": 0
+            },
+            {
+              "n": 5,
+              "task": "T-003",
+              "stage": "qa"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hardstop",
+      "steps": [
+        {
+          "id": "run",
+          "layer": "specialists",
+          "state": "running",
+          "files": ["supervisor.lock", "running.json"],
+          "units": [
+            {
+              "n": 7,
+              "task": "T-004",
+              "stage": "implement"
+            }
+          ]
+        },
+        {
+          "id": "stray",
+          "layer": "specialists",
+          "state": "running",
+          "danger": true,
+          "files": ["supervisor.lock", "running.json"],
+          "units": [
+            {
+              "n": 7,
+              "task": "T-004",
+              "stage": "implement"
+            }
+          ]
+        },
+        {
+          "id": "scope",
+          "layer": "contracts",
+          "state": "running",
+          "danger": true,
+          "files": ["supervisor.lock", "running.json"],
+          "units": [
+            {
+              "n": 7,
+              "task": "T-004",
+              "stage": "implement",
+              "code": 1
+            }
+          ]
+        },
+        {
+          "id": "stash",
+          "layer": "runner",
+          "state": "running",
+          "danger": true,
+          "files": ["supervisor.lock", "running.json", "handoffs.jsonl"],
+          "units": [
+            {
+              "n": 7,
+              "task": "T-004",
+              "stage": "implement",
+              "code": 1
+            }
+          ]
+        },
+        {
+          "id": "next",
+          "layer": "runner",
+          "state": "running",
+          "files": ["supervisor.lock", "running.json", "handoffs.jsonl"],
+          "units": [
+            {
+              "n": 7,
+              "task": "T-004",
+              "stage": "implement",
+              "code": 1
+            },
+            {
+              "n": 8,
+              "task": "T-005",
+              "stage": "plan"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "usage",
+      "steps": [
+        {
+          "id": "start",
+          "layer": "coordinator",
+          "state": "running",
+          "files": ["supervisor.lock", "running.json"],
+          "units": [
+            {
+              "n": 9,
+              "task": "T-005",
+              "stage": "plan"
+            }
+          ]
+        },
+        {
+          "id": "refused",
+          "layer": "coordinator",
+          "state": "running",
+          "danger": true,
+          "files": ["supervisor.lock", "running.json"],
+          "units": [
+            {
+              "n": 9,
+              "task": "T-005",
+              "stage": "plan",
+              "code": 4
+            }
+          ]
+        },
+        {
+          "id": "probe",
+          "layer": "supervisor",
+          "state": "waiting",
+          "files": ["supervisor.lock"],
+          "units": [
+            {
+              "n": 9,
+              "task": "T-005",
+              "stage": "plan",
+              "code": 4
+            }
+          ]
+        },
+        {
+          "id": "retry",
+          "layer": "contracts",
+          "state": "running",
+          "files": ["supervisor.lock", "running.json"],
+          "units": [
+            {
+              "n": 9,
+              "task": "T-005",
+              "stage": "plan",
+              "code": 4
+            },
+            {
+              "n": 10,
+              "task": "T-005",
+              "stage": "plan",
+              "code": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stop",
+      "steps": [
+        {
+          "id": "run",
+          "layer": "specialists",
+          "state": "running",
+          "files": ["supervisor.lock", "running.json"],
+          "units": [
+            {
+              "n": 11,
+              "task": "T-006",
+              "stage": "qa"
+            }
+          ]
+        },
+        {
+          "id": "write",
+          "layer": "specialists",
+          "state": "running",
+          "files": ["supervisor.lock", "running.json", "STOP"],
+          "units": [
+            {
+              "n": 11,
+              "task": "T-006",
+              "stage": "qa"
+            }
+          ]
+        },
+        {
+          "id": "finish",
+          "layer": "contracts",
+          "state": "running",
+          "files": ["supervisor.lock", "running.json", "STOP"],
+          "units": [
+            {
+              "n": 11,
+              "task": "T-006",
+              "stage": "qa",
+              "code": 0
+            }
+          ]
+        },
+        {
+          "id": "exit",
+          "layer": "supervisor",
+          "state": "stopped",
+          "files": ["STOP"],
+          "units": [
+            {
+              "n": 11,
+              "task": "T-006",
+              "stage": "qa",
+              "code": 0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

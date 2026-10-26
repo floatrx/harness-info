@@ -1,0 +1,214 @@
+<Note title="Where these commands come from">
+  Every command on this page is in the harness-demo CLI; `harness --help` prints the full list. When the CLI changes, this page changes with
+  it.
+</Note>
+
+## How the loop is built
+
+The loop is two programs inside each other. The supervisor runs for hours; the runner runs one unit and exits.
+
+| Layer       | Lives for         | Does                                                                                                                    |
+| ----------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| supervisor  | the whole run     | takes the lock, runs batches of units, reads PAUSE and STOP between units, reacts to exit codes, waits out usage limits |
+| runner      | one unit          | picks a task, takes a snapshot, starts the coordinator, checks the contracts, records the result, exits with a code     |
+| coordinator | one unit          | the `claude -p` process: reads the task and calls specialists                                                           |
+| specialists | part of a unit    | do one narrow job each and leave a verdict                                                                              |
+| contracts   | the end of a unit | scope, gate, trace, closing: code that decides whether the unit counts                                                  |
+
+Step through five runs to see which layer is busy, what the trace folder holds, and how pause, stop, a hard stop
+and a usage limit play out.
+
+<LoopAnatomy />
+
+Every command below takes `--project`, with a path, or the id or name the project was registered under. Without it,
+the command uses the current folder, which must contain a `.harness/` folder. The examples use the demo's sample
+project, created and registered with `harness example ~/code/bookmarks`; the project name defaults to the folder name.
+
+## Start
+
+From the dashboard, press **Start**. It spawns `harness run --project <path>` as a detached process, with its output
+in `.harness/trace/supervisor.out`. The dashboard's **Pause**, **Resume** and **Stop** write the same files as the CLI;
+the dashboard never signals or kills a process. Its dock shows the supervisor as Running, Paused, Stopping (STOP is
+written, the unit is finishing) or Not running.
+
+From a terminal:
+
+```bash
+harness run --project bookmarks
+```
+
+By default the run does not end when the queue is empty: it checks for new work every `supervisor.idlePollSeconds`
+(30 seconds by default) until you stop it. These options change that, and `harness unit` runs a single unit to try
+things out:
+
+```bash
+harness run --project bookmarks --deadline 120   # a time limit for the run, in minutes
+harness run --project bookmarks --max-units 5    # at most five units
+harness run --project bookmarks --once-through   # exit as soon as nothing is left to take
+harness unit --project bookmarks                 # exactly one unit; exits with the runner's code
+```
+
+Two commands are worth running first, and neither spends a token:
+
+```bash
+harness agents --check --project bookmarks   # the registry, standing-rules drift, the model split
+harness preview T-002 --project bookmarks    # the exact command and prompt of the next unit
+```
+
+Before the first unit, the supervisor checks two things and refuses to start if either fails:
+
+- **No other loop runs on this checkout.** It holds the lock file `.harness/trace/supervisor.lock` for the whole run.
+- **The base branch is clean.** It refuses a dirty tree it did not make, because the scope contract would blame your
+  changes on the agent.
+
+## Pause and resume
+
+```bash
+harness pause --project bookmarks
+harness resume --project bookmarks
+```
+
+`harness pause` writes the file `.harness/trace/PAUSE`. `harness resume` deletes it. The dashboard's **Pause** and
+**Resume** buttons write the same file.
+
+The pause does not interrupt the unit that is running. The supervisor reads the file **between units**, so the unit
+in flight finishes, its contracts run, and then the loop waits.
+
+<Note title="Why a file and not a signal">
+  A signal such as Ctrl+C arrives in the middle of a turn, while an agent may be half way through an edit. A file is read at the unit
+  boundary, where nothing is in flight. You always get a consistent state.
+</Note>
+
+## Stop
+
+```bash
+harness stop --project bookmarks
+```
+
+`harness stop` writes `.harness/trace/STOP`. The supervisor finishes the current unit, exits, and does not come back
+until you start it again.
+
+If you have to stop it at once, stop the supervisor process you started, by its PID. Because the disk is the state,
+you lose only the unit that was running. Never kill processes by pattern (`pkill -f`, `killall`): the pattern matches
+far more than you think, including other Claude sessions.
+
+## Exit codes
+
+Every unit ends with an exit code from the runner. The supervisor reads it and decides what to do next.
+
+| Runner code | Meaning                                                                                                   | What happens next                                                                     |
+| ----------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `0`         | the unit is done                                                                                          | the supervisor takes the next unit                                                    |
+| `1`         | a hard stop: scope, task file, trace, gate, or the agent crashed                                          | the unit's work goes into a named stash, the task is parked, the supervisor continues |
+| `2`         | the configuration is broken: `config.json`, drifted standing rules, or a judge on the implementer's model | the supervisor stops: waiting will not fix it                                         |
+| `3`         | nothing is left to take                                                                                   | the supervisor polls for new work; with `--once-through` it ends the run              |
+| `4`         | the agent could not run: usage limit, network, login                                                      | the supervisor waits, then retries                                                    |
+
+A hard stop throws nothing away. The runner moves the unit's changes into a `git stash` named
+`harness quarantine: T-NNN unit N`, restores the tree, and writes the reason into the task. You can inspect the stash
+before you reopen the task.
+
+The supervisor has its own exit codes, for when the whole run ends:
+
+| Supervisor code | Why the run ended                                                                                                            |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `0`             | it was stopped, the queue drained under `--once-through`, or the deadline or `--max-units` was reached                       |
+| `2`             | the configuration is broken, or `deliver.pr` is on and a remote, `gh`, its login or the base branch on the remote is missing |
+| `3`             | barren: three batches in a row moved nothing                                                                                 |
+| `4`             | it gave up waiting for the agent                                                                                             |
+
+The barren rule keeps a stuck loop from spinning: **three batches in a row that moved nothing stop it.** Progress means
+new commits **or** new handoffs, not just one of them.
+
+## Usage limits and outages
+
+Exit code 4 means the agent never got to work, so the task is untouched. The supervisor waits and tries again: it
+probes the network every 30 seconds, and when the network is fine but the agent is still refused, for example by a
+usage limit, it naps for 30 minutes before the next try. After six hours of waiting it gives up and stops with code 4.
+The timings are `supervisor.usageProbeSeconds`, `supervisor.usageNapSeconds` and `supervisor.usageCeilingSeconds` in
+`config.json`.
+
+A project can add its own `probe:` command to `config.json`, for example a check that the dev server answers. When the
+probe fails, the unit ends with code 4 and nothing is touched.
+
+## Do not edit while a unit runs
+
+The scope contract compares the whole working tree before and after a unit. It cannot tell your edit from the agent's.
+If you save a file in the project while a unit runs, the unit fails, and the task is parked for something you did.
+
+The safe order:
+
+1. Pause.
+2. Wait until the running unit finishes. The dashboard shows when nothing is in flight.
+3. Make your edit and commit it.
+4. Resume.
+
+The same reason allows only one loop per checkout. Running tasks side by side needs one git worktree per task, which is
+planned after the first version.
+
+## Watching a run
+
+```bash
+harness status --project bookmarks
+harness status --project bookmarks --json   # the same, for scripts
+```
+
+The dashboard's **Live** view shows more: the supervisor's state, the unit in flight, its agents with their role,
+elapsed time and current tool, the pace, and the supervisor log. The snapshot behind it carries role names, tool names
+and file names only, never tool arguments or message text.
+
+<Shot name="live" plain />
+
+## Telegram notifications
+
+The harness can tell you in Telegram when a task needs you
+([`harness/notify.ts`](https://github.com/floatrx/harness-demo/blob/main/harness/notify.ts)). It needs two keys,
+`TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`, and looks for them in this order. The first place that defines the token
+decides:
+
+1. the environment;
+2. `<project>/.env`;
+3. `$HARNESS_HOME/.env`, which is `~/.harness/.env` by default.
+
+An empty token switches notifications off. `harness projects add` puts `.env` into the project's `.gitignore`, so the
+keys stay out of git.
+
+| Event         | When it fires                                                     |
+| ------------- | ----------------------------------------------------------------- |
+| `needs-input` | a task waits for your answers                                     |
+| `planned`     | a plan waits for your approval (only with `autonomy.mode: gated`) |
+| `prototype`   | a prototype round waits for your review (only with `gated`)       |
+| `parked`      | a task is parked, with the reason                                 |
+| `done`        | a task is confirmed                                               |
+| `delivered`   | a pull request is open, with its link                             |
+| `supervisor`  | a run ended by itself, or the first usage-limit wait began        |
+
+All events are on by default; `notify.events` in `config.json` narrows the list. A message carries the project name,
+the task id and title, the event and the pull request link. It never links to the local dashboard. Notifications go one
+way: the harness only sends. A failed send never fails a unit; it adds one `notify · … not sent` line to
+`progress.log`, with the token removed.
+
+```bash
+harness notify --project bookmarks          # where the keys come from; never prints the token
+harness notify --project bookmarks --test   # send one test message
+```
+
+## What is in the trace folder
+
+Everything the loop knows about itself is in `.harness/trace/`. The project's `.gitignore` keeps `trace/`, `artifacts/`,
+`tasks/` and `JOURNAL.md` out of git; only `config.json` is versioned. Task files are ignored on purpose: the runner
+rewrites them while it switches between the base branch and the task branch, and a versioned task file that differs
+between branches would make the checkout fail. A task's history lives in its `## Log` and in `handoffs.jsonl`.
+
+| File                    | What it is                                                                                                                        |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `supervisor.lock`       | held by the running supervisor; a second loop refuses to start                                                                    |
+| `PAUSE`                 | present = pause at the next unit boundary                                                                                         |
+| `STOP`                  | present = stop at the next unit boundary                                                                                          |
+| `running.json`          | the task a unit is working on right now                                                                                           |
+| `progress.log`          | the supervisor's log                                                                                                              |
+| `supervisor.out`        | the supervisor's output when the dashboard started the run                                                                        |
+| `handoffs.jsonl`        | what each unit handed to the next: start time, verdict, tokens, cost and any permission denials                                   |
+| `unit-seq`              | the counter that numbers units                                                                                                    |
+| `unit-NNNN.jsonl`       | one file per unit: the agent's stream-json output, each line stamped with `harness_ts`; the trace contract finds the verdict here |
+| `unit-NNNN.agents.json` | the specialists passed to that unit with `--agents`                                                                               |
