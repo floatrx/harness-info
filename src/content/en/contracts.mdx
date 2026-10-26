@@ -102,8 +102,8 @@ Every criterion is tagged:
 
 - **`[closes]`** — a shell command, written after a colon. The runner runs it; exit code 0 means the criterion is
   met. Only these decide whether the task closes.
-- **`[found]`** — something a reviewer checks and reports, such as behaviour in the running app. The units have no
-  browser, so qa never fails or parks a task over a `[found]` criterion that needs a person: it copies it word for word
+- **`[found]`** — something a reviewer checks and reports, such as behaviour in the running app. A unit has a
+  browser only when the project sets [`app`](/adapt#your-app-for-qa-and-prototype-units) and the app started. Without one, qa never fails or parks a task over a `[found]` criterion that needs a person: it copies it word for word
   into a **For the reviewer** list in `.harness/artifacts/T-NNN/qa-report.md`. The pull request lists it unchecked,
   for a human, and the judge judges it from the code.
 - **`[process]`** — something a human does, such as a design review.
@@ -157,7 +157,10 @@ broken configuration, so no agent runs on outdated rules.
 
 Rule 11 says to run one plain command per Bash call. Under `--permission-mode dontAsk`, Claude Code refuses `$?`,
 `$(…)`, shell variables and `mkdir`, whatever the allowlist says, so an agent writes its evidence with the Write tool.
-The runner creates the task's artifacts folder before the unit starts.
+The runner creates the task's artifacts folder before the unit starts. The allowlist matches how a command starts, so the
+rule also says: run git from the folder you start in (`git diff main...HEAD`), never `git -C <path>`, and change files
+with the Write and Edit tools, never `tee`, `echo >` or `cat >`. A real run found it: qa and the judge both asked for
+`git -C <path> diff` and were refused.
 
 ## Model split
 

@@ -87,7 +87,8 @@ names such tasks in its out-of-scope list instead.
 ## The prototype step
 
 Tasks with `kind: ui` get one more stage before code. The designer builds a prototype as a route in the app and leaves a
-picture of it in the task's artifacts folder. Units have no browser, so when no allowed command can take a screenshot,
+picture of it in the task's artifacts folder. A unit has a browser only when the project sets [`app`](/adapt#your-app-for-qa-and-prototype-units) and the app started. Without one, when no
+allowed command can take a screenshot,
 it draws `prototype.svg`: a 1440 px wide wireframe with the page's real copy, layout and colours, one column per state,
 nothing overlapping. A screenshot saves as `prototype.png`. The designer never starts a server it cannot stop. The dashboard shows the picture on the card and in the drawer; a round that
 leaves none gets a note in `## Log`, and you can still review the route. The card stops in `prototype` and waits for
