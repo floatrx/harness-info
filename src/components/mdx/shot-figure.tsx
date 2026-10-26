@@ -96,7 +96,7 @@ export const ShotFigure = ({ id, src, alt, caption, markers, labels, more, eager
             {more && (
               <>
                 {' '}
-                <Link href={more.href} className="whitespace-nowrap text-accent underline-offset-[3px] hover:underline">
+                <Link href={more.href} className="whitespace-nowrap text-accent underline decoration-accent-line underline-offset-[3px] hover:decoration-accent">
                   {more.label} →
                 </Link>
               </>

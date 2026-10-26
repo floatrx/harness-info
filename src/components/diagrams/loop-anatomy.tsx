@@ -69,7 +69,7 @@ export const LoopAnatomy = () => {
 
         <div className="grid content-start gap-3 sm:grid-cols-2 lg:grid-cols-1">
           <section className="rounded-lg bg-surface-2 p-3">
-            <h4 className="mb-2 text-sm font-semibold text-ink">{t('units')}</h4>
+            <h3 className="mb-2 text-sm font-semibold text-ink">{t('units')}</h3>
             <ol className="flex flex-col gap-1">
               <AnimatePresence initial={false}>
                 {(step.units as Unit[]).map((unit) => (
@@ -101,7 +101,7 @@ export const LoopAnatomy = () => {
             </ol>
           </section>
           <section className="rounded-lg bg-surface-2 p-3">
-            <h4 className="mb-2 font-mono text-sm font-semibold text-ink">.harness/trace/</h4>
+            <h3 className="mb-2 font-mono text-sm font-semibold text-ink">.harness/trace/</h3>
             <ul className="flex flex-col gap-0.5">
               <AnimatePresence initial={false}>
                 {step.files.map((file) => (
@@ -160,7 +160,7 @@ const StateBadge = ({ state, label }: { state: string; label: string }) => (
   <span
     className={cn(
       'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold',
-      state === 'running' ? 'bg-accent-soft text-accent' : 'bg-surface-3 text-ink',
+      state === 'running' ? 'bg-accent-soft text-accent-text' : 'bg-surface-3 text-ink',
     )}
   >
     {state === 'running' ? (

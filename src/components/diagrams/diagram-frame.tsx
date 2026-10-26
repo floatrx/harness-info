@@ -91,7 +91,9 @@ export const DiagramFrame = ({ label, scenarios, scenario, onScenario, stepper, 
           {stepper.playing ? t('pause') : stepper.atEnd ? t('replay') : t('play')}
         </button>
         <span className="min-w-[84px] text-[12.5px] text-ink-mute tabular-nums">{t('goTo', { n: stepper.step + 1, total: length })}</span>
-        <ol className="flex min-w-0 flex-1 gap-[3px]">
+        {/* Phones: the step buttons would be narrower than 24 px, so a plain track shows progress and ← → Play do the work. */}
+        <Track total={length} at={stepper.step} height={3} className="min-w-0 flex-1 min-[900px]:hidden" />
+        <ol className="hidden min-w-0 flex-1 gap-[3px] min-[900px]:flex">
           {Array.from({ length }, (_, index) => (
             <li key={index} className="min-w-0 flex-1">
               <button

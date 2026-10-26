@@ -30,6 +30,8 @@
   --color-accent-ink: #0d0d0d;
   --color-accent-soft: rgb(217 119 87 / 0.14);
   --color-accent-line: rgb(217 119 87 / 0.5);
+  /* The accent for small text on an accent-soft fill: #d97757 there is 3.6:1, this is 5:1 (WCAG AA). */
+  --color-accent-text: #eb9a7e;
 
   /* Progress tracks */
   --color-track: #262626;

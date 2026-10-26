@@ -39,7 +39,8 @@ const Row = ({ children, ...props }: ComponentProps<'tr'>) => {
 };
 
 const Anchor = ({ href = '', className, ...props }: ComponentProps<'a'>) => {
-  const style = cn('text-accent underline-offset-[3px] hover:underline', className);
+  // Underlined at rest: a link in running text must not differ by colour alone.
+  const style = cn('text-accent underline decoration-accent-line underline-offset-[3px] hover:decoration-accent', className);
   // Internal links go through the locale-aware Link, so they keep the reader's language.
   if (href.startsWith('/')) return <Link href={href} className={style} {...props} />;
   if (href.startsWith('#')) return <a href={href} className={style} {...props} />;

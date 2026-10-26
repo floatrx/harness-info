@@ -75,7 +75,8 @@ export const CoordinatorSequence = () => {
                 className={cn(
                   'relative h-12 rounded-btn transition-[opacity,background-color] duration-300',
                   state === 'current' && 'bg-surface-2',
-                  state === 'future' && 'opacity-20',
+                  // A future step shows its arrow but not its label: dimmed text would fall below 4.5:1 contrast.
+                  state === 'future' && 'opacity-20 [&_[data-label]]:invisible',
                 )}
               >
                 {/* Lifelines; the coordinator's ends at the step where its process exits. */}
@@ -143,6 +144,7 @@ const Arrow = ({ x1, x2, color, kind, label, active }: ArrowProps) => {
   return (
     <>
       <span
+        data-label
         className="absolute top-1.5 -translate-x-1/2 text-[11.5px] leading-tight whitespace-nowrap sm:text-[13px]"
         style={{ left: `${left + width / 2}%`, color: active ? 'var(--color-ink)' : 'var(--color-ink-soft)' }}
       >
@@ -206,6 +208,7 @@ const SelfMessage = ({ x, color, kind, label, active }: SelfProps) => (
       }
     />
     <span
+      data-label
       className="absolute top-1/2 -translate-y-1/2 pl-5 text-[11.5px] leading-tight whitespace-nowrap sm:text-[13px]"
       style={{ left: `${x}%`, color: kind === 'fail' ? 'var(--color-danger)' : active ? 'var(--color-ink)' : 'var(--color-ink-soft)' }}
     >
