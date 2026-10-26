@@ -60,16 +60,16 @@ Every other key keeps its default in code, so a changed default reaches every pr
 
 Keys you can add when you need them:
 
-| Key                    | Default                             | What it does                                                                  | More                      |
-| ---------------------- | ----------------------------------- | ----------------------------------------------------------------------------- | ------------------------- |
-| `roles.models`         | coordinators `sonnet`, judge `opus` | the model per role; the judge must differ from the implementer and the tester | [Roles](/roles)           |
-| `roles.mergeQaJudge`   | `false`                             | one review unit per task instead of two                                       | [Roles](/roles)           |
-| `notify.events`        | all seven                           | which Telegram events to send                                                 | [Running the loop](/loop) |
-| `agent.command`        | `null`                              | a command that replaces `claude`, like `AGENT_CMD`                            |                           |
-| `agent.permissionMode` | `dontAsk`                           | `claude --permission-mode`: refuse what is not allowed instead of waiting     |                           |
-| `agent.allowedTools`   | a list                              | `claude --allowedTools`; commits and pushes are absent on purpose             |                           |
-| `agent.settingSources` | `project,local`                     | `claude --setting-sources`: your personal hooks never fire inside the loop    |                           |
-| `supervisor.*`         | in code                             | poll and wait intervals, and `barrenUnits: 3`                                 | [Running the loop](/loop) |
+| Key                    | Default                             | What it does                                                                                                               | More                      |
+| ---------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `roles.models`         | coordinators `sonnet`, judge `opus` | the model per role; the judge must differ from the implementer and the tester                                              | [Roles](/roles)           |
+| `roles.mergeQaJudge`   | `false`                             | one review unit per task instead of two                                                                                    | [Roles](/roles)           |
+| `notify.events`        | all seven                           | which Telegram events to send                                                                                              | [Running the loop](/loop) |
+| `agent.command`        | `null`                              | a command that replaces `claude`, like `AGENT_CMD`                                                                         |                           |
+| `agent.permissionMode` | `dontAsk`                           | `claude --permission-mode`: refuse what is not allowed instead of waiting                                                  |                           |
+| `agent.allowedTools`   | a list                              | `claude --allowedTools`; read-only `grep`, `cat`, `head`, `tail` and `wc` are in, commits and pushes are absent on purpose |                           |
+| `agent.settingSources` | `project,local`                     | `claude --setting-sources`: your personal hooks never fire inside the loop                                                 |                           |
+| `supervisor.*`         | in code                             | poll and wait intervals, and `barrenUnits: 3`                                                                              | [Running the loop](/loop) |
 
 ## Your own specialist
 

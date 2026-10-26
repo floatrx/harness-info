@@ -98,6 +98,9 @@ retrying blind.
 The rejection that brings `bounces` to `limits.bounces` — 2 by default — does not send the task back. It parks it,
 with the reason, for a human: at most two implement rounds. Without a cap, an implementer and a judge can disagree forever, and every round costs a full unit.
 
+A round that changes nothing does not park the task when the branch already holds its work; the
+[contracts](/contracts) page explains why that matters for a wrong rejection.
+
 ## Memory between units
 
 A fresh context remembers nothing, so the runner writes a short memory into every prompt, as its `## Memory` section:

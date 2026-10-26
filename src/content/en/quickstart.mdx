@@ -19,10 +19,10 @@ harness self-test
 ```
 
 `self-test` runs every contract case on a throwaway git repository with the fake agent, so it spends no tokens. It
-takes about ten seconds and ends with:
+takes about fifteen seconds and ends with:
 
 ```text
-29/29 cases passed
+33/33 cases passed
 ```
 
 The alias lasts for this shell. Run the commands below from the harness-demo folder.
@@ -37,7 +37,7 @@ harness example ~/harness-bookmarks
 copied examples/app → ~/harness-bookmarks
 pnpm install …
 initial commit on main
-registered a79751 · harness-bookmarks
+registered ad2610 · harness-bookmarks
 
 next:
   harness submit T-002 --project harness-bookmarks
@@ -86,7 +86,8 @@ one.
    ```
 
    ```text
-   supervisor · start · pid 33112 · once-through
+   supervisor · start · pid 8653 · once-through
+   supervisor · billing: a stand-in replaces claude — no tokens
    unit 1 · T-002 · spec · writer · start
    unit 1 · T-002 · spec · exit 0 · spec → plan
    unit 2 · T-002 · plan · planner · start
@@ -105,9 +106,10 @@ one.
    ```
 
    ```text
-   supervisor · start · pid 33194 · once-through
+   supervisor · start · pid 8749 · once-through
+   supervisor · billing: a stand-in replaces claude — no tokens
    unit 3 · T-002 · implement · implementer · start
-   unit 3 · T-002 · implement · exit 0 · implementing → qa · commit 864e9c9
+   unit 3 · T-002 · implement · exit 0 · implementing → qa · commit 563721b
    unit 4 · T-002 · qa · qa · start
    unit 4 · T-002 · qa · exit 0 · qa → judge
    unit 5 · T-002 · judge · judge · start
@@ -128,8 +130,8 @@ one.
    T-002  done         Do not add the same URL twice
    T-003  draft        Make the bookmarks better
 
-   864e9c9 T-002: Do not add the same URL twice (round 1)
-   8f692c4 chore: example app from harness-demo
+   563721b T-002: Do not add the same URL twice (round 1)
+   6edcc88 chore: example app from harness-demo
    ```
 
    The harness made one commit on the task branch, after the gate passed. Nothing else changed.

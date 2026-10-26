@@ -15,6 +15,7 @@ point is that you were not watching, so the only things you can trust afterwards
 | standing rules        | Does every agent file carry the current shared rules?                          | the runner exits 2          |
 | model split           | Is the judge on a different model from the implementer and the tester?         | the runner exits 2          |
 | branch                | Before a push: is the task branch there, ahead of base, every commit `T-NNN:`? | task parked, nothing pushed |
+| plan                  | Is every `[closes]` command a real command in this project?                    | plan parked, no code yet    |
 | probe                 | Is the environment up?                                                         | exit 4, task untouched      |
 
 A **hard stop** ends the unit with exit code 1 and keeps the evidence. It fires on a failed scope, task-file, trace or
@@ -95,9 +96,12 @@ commands that code runs.
 
 Every criterion is tagged:
 
-- **`[closes]`** — a shell command. The runner runs it; exit code 0 means the criterion is met. Only these decide
-  whether the task closes.
-- **`[found]`** — something a reviewer checks and reports, such as behaviour in the running app.
+- **`[closes]`** — a shell command, written after a colon. The runner runs it; exit code 0 means the criterion is
+  met. Only these decide whether the task closes.
+- **`[found]`** — something a reviewer checks and reports, such as behaviour in the running app. The units have no
+  browser, so qa never fails or parks a task over a `[found]` criterion that needs a person: it copies it word for word
+  into a **For the reviewer** list in `.harness/artifacts/T-NNN/qa-report.md`. The pull request lists it unchecked,
+  for a human, and the judge judges it from the code.
 - **`[process]`** — something a human does, such as a design review.
 
 Continuing the T-002 illustration:
@@ -105,10 +109,16 @@ Continuing the T-002 illustration:
 ```markdown
 ## Acceptance criteria
 
-1. **[closes]** `node --test src/lib/bookmarks.test.ts` exits 0
+1. **[closes]** Adding the same URL twice is rejected: `node --test src/lib/bookmarks.test.ts`
 2. **[found]** adding a URL that is already in the list keeps the old bookmark and tells the user
 3. **[process]** a human reads the message wording
 ```
+
+The command is the first backtick span **after a colon**, so names in backticks before it stay plain text. A
+criterion without a colon falls back to its first span, so older task files still parse. Before any code is written,
+the plan contract checks every command: its first word, after `!` and `VAR=` prefixes, must pass `command -v` in the
+project. A name or a path there parks the plan with "criterion N: `word` is not a command here", so a typo costs one
+plan round instead of overruling a correct judge.
 
 The tag works with or without bold; `**[closes]**` is the canonical form. Aim for one `[closes]` per task. The [first lesson](/lessons) explains why more is worse.
 
@@ -117,7 +127,13 @@ The tag works with or without bold; `**[closes]**` is the canonical form. Aim fo
 qa FAIL and judge REJECTED share the counter `bounces` in the task's frontmatter. The rejection that brings it to
 `limits.bounces`, 2 by default, parks the task with the reason instead of sending it back to the implementer. With the
 default that means at most two implement rounds and two commits. `qa: CANNOT_VERIFY` parks the task too, but it is not
-a bounce. **Reopen** sets `bounces` back to 0.
+a bounce: it means a `[closes]` command or the gate could not run, such as a missing tool. **Reopen** sets `bounces`
+back to 0.
+
+An implement round that changes nothing goes on to qa without a commit when the task branch already holds this task's
+commits; the log says "no change this round". The implementer is told to change nothing when the reason for a
+rejection is not in the code, so this is how a wrong rejection or a broken check recovers. A round with no work on the
+branch at all still parks with "implement: no change inside scope".
 
 ## One loop per checkout
 
@@ -130,6 +146,10 @@ Some rules every agent needs, whatever its role. They live in one file, `harness
 `harness agents --sync` copies them between markers into every base agent. A project agent without the block gets it
 added. Before a unit, the runner compares every copy with the source. A drifted copy makes it exit with code 2,
 broken configuration, so no agent runs on outdated rules.
+
+Rule 11 says to run one plain command per Bash call. Under `--permission-mode dontAsk`, Claude Code refuses `$?`,
+`$(…)`, shell variables and `mkdir`, whatever the allowlist says, so an agent writes its evidence with the Write tool.
+The runner creates the task's artifacts folder before the unit starts.
 
 ## Model split
 

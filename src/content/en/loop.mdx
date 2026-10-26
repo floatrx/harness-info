@@ -61,7 +61,8 @@ Before the first unit, the supervisor checks two things and refuses to start if 
 - **The base branch is clean.** It refuses a dirty tree it did not make, because the scope contract would blame your
   changes on the agent.
 
-Its first log line says how the run is billed, from the environment it starts in:
+Right after its start line, it logs one line, `supervisor · billing: …`, that says how the run is billed, from the
+environment it starts in:
 
 | The line says                                                                                      | When                                      |
 | -------------------------------------------------------------------------------------------------- | ----------------------------------------- |
