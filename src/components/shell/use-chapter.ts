@@ -8,13 +8,16 @@ export const useChapter = () => {
   const pathname = usePathname();
   const slug = pathname.replace(/^\//, '') as DocSlug;
   const index = docSlugs.indexOf(slug);
-  const isHome = index < 0;
+  const isHome = pathname === '/';
+  // Neither the home page nor a chapter: the 404. Nothing is current there, and there is no next step.
+  const isLost = !isHome && index < 0;
   return {
-    slug: isHome ? null : slug,
+    slug: index < 0 ? null : slug,
     index,
     isHome,
+    isLost,
     total: docSlugs.length,
-    prev: isHome || index === 0 ? null : docSlugs[index - 1],
-    next: isHome ? docSlugs[0] : (docSlugs[index + 1] ?? null),
+    prev: index <= 0 ? null : docSlugs[index - 1],
+    next: isHome ? docSlugs[0] : index < 0 ? null : (docSlugs[index + 1] ?? null),
   };
 };

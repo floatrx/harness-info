@@ -36,6 +36,7 @@
     "tailwind-variants": "^3.3.1"
   },
   "devDependencies": {
+    "@fontsource/onest": "^5.3.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/mdx": "^2.0.14",
     "@types/node": "^25.9.9",

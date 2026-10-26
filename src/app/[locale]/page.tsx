@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+
 import { getTranslations } from 'next-intl/server';
 
 import { TaskFlow } from '@/components/diagrams/task-flow';
@@ -6,6 +8,17 @@ import { Dock } from '@/components/shell/dock';
 import { TopLine } from '@/components/shell/top-line';
 import { docSlugs } from '@/config/navigation';
 import { Link } from '@/i18n/navigation';
+import { pageMetadata } from '@/lib/metadata';
+
+interface Props {
+  params: Promise<{ locale: string }>;
+}
+
+export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
+  const { locale } = await params;
+  const t = await getTranslations({ locale });
+  return pageMetadata({ locale, path: '', title: t('home.title'), description: t('site.description'), siteName: t('site.name') });
+};
 
 export default async function HomePage() {
   const t = await getTranslations();

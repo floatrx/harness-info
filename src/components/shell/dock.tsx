@@ -32,7 +32,9 @@ export const Dock = async ({ slug, headings }: Props) => {
         <Title>{t('nav.guide')}</Title>
         <p className="mb-2.5 text-[18px] font-semibold tracking-[-0.01em] text-ink">
           {slug ? t('doc.chapterOf', { n: index + 1, total }) : t('nav.overview')}
-          {!slug && <span className="mt-0.5 block text-[13px] font-medium tracking-normal text-ink-mute">{t('doc.beforeFirst', { total })}</span>}
+          {!slug && (
+            <span className="mt-0.5 block text-[13px] font-medium tracking-normal text-ink-mute">{t('doc.beforeFirst', { total })}</span>
+          )}
         </p>
         <Track total={total} at={index} />
       </section>

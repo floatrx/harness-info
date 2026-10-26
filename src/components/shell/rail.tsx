@@ -35,7 +35,7 @@ const External = ({ href, icon, text, tip }: { href: string; icon: ReactNode; te
 /** The site rail, as on the dashboard: the mark, the overview, the guide, then the outside links. */
 export const Rail = () => {
   const t = useTranslations('nav');
-  const { isHome } = useChapter();
+  const { isHome, slug } = useChapter();
 
   return (
     <nav
@@ -55,8 +55,8 @@ export const Rail = () => {
       </Link>
       <Link
         href={`/${docSlugs[0]}`}
-        aria-current={!isHome ? 'true' : undefined}
-        className={cn(item, !isHome && 'bg-accent-soft text-accent hover:bg-accent-soft hover:text-accent')}
+        aria-current={slug ? 'true' : undefined}
+        className={cn(item, slug && 'bg-accent-soft text-accent hover:bg-accent-soft hover:text-accent')}
       >
         <GuideIcon className="size-[19px]" />
         <Label text={t('guide')} tip={t('chaptersMeta')} />

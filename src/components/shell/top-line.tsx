@@ -19,7 +19,10 @@ export const TopLine = () => {
       <Link href="/" aria-label="harness info" className="hidden size-11 place-items-center rounded-[9px] text-accent max-[899px]:grid">
         <MarkIcon />
       </Link>
-      <nav aria-label={t('nav.whereAmI')} className="flex flex-wrap items-center gap-x-2 gap-y-1 text-ink-mute max-[899px]:text-[14px] min-[900px]:shrink-0">
+      <nav
+        aria-label={t('nav.whereAmI')}
+        className="flex flex-wrap items-center gap-x-2 gap-y-1 text-ink-mute max-[899px]:text-[14px] min-[900px]:shrink-0"
+      >
         <Link
           href="/"
           className="text-[14.5px] font-semibold text-ink max-[899px]:-mx-1.5 max-[899px]:inline-flex max-[899px]:min-h-11 max-[899px]:items-center max-[899px]:px-1.5"

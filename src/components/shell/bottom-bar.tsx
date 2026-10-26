@@ -15,7 +15,7 @@ const sheetLink = 'flex min-h-14 flex-col items-center justify-center gap-1 roun
 /** Phones: the guide menu and the next step, in thumb reach. */
 export const BottomBar = () => {
   const t = useTranslations();
-  const { index, isHome, next, total } = useChapter();
+  const { index, isHome, isLost, next, total } = useChapter();
   const sheet = useRef<HTMLDialogElement>(null);
   const close = () => sheet.current?.close();
 
@@ -26,12 +26,15 @@ export const BottomBar = () => {
           type="button"
           aria-haspopup="dialog"
           onClick={() => sheet.current?.showModal()}
-          className="flex h-[50px] items-center gap-2 rounded-panel border border-line bg-surface-2 px-3.5 text-[14px] font-semibold whitespace-nowrap text-ink"
+          className={cn(
+            'flex h-[50px] items-center gap-2 rounded-panel border border-line bg-surface-2 px-3.5 text-[14px] font-semibold whitespace-nowrap text-ink',
+            isLost && 'flex-1 justify-center',
+          )}
         >
           <ListIcon className="size-[18px] text-ink-mute" />
-          {isHome ? t('nav.chaptersButton') : t('doc.chapterOf', { n: index + 1, total })}
+          {index < 0 ? t('nav.chaptersButton', { total }) : t('doc.chapterOf', { n: index + 1, total })}
         </button>
-        {next ? (
+        {isLost ? null : next ? (
           <Link
             href={`/${next}`}
             data-testid="bottom-next"

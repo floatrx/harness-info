@@ -19,7 +19,7 @@
     "whereAmI": "Where you are",
     "siteNav": "Site sections",
     "guideNav": "Guide chapters",
-    "chaptersButton": "Chapters · 7"
+    "chaptersButton": "Chapters · {total}"
   },
   "pages": {
     "concepts": {
@@ -102,6 +102,7 @@
   },
   "notFound": {
     "title": "This page does not exist",
+    "lead": "It may have been renamed. Pick a chapter, or go back to the overview.",
     "back": "Back to the overview"
   },
   "diagrams": {
@@ -454,5 +455,8 @@
         "track": "The stage track is lit to the end: <code>delivered</code> is the last status."
       }
     }
+  },
+  "og": {
+    "footer": "A guide to an autonomous task harness for Claude Code"
   }
 }

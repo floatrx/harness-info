@@ -11,12 +11,14 @@ import { TopLine } from '@/components/shell/top-line';
 import { docSlugs, isDocSlug } from '@/config/navigation';
 import { routing } from '@/i18n/routing';
 import { getHeadings } from '@/lib/content';
+import { pageMetadata } from '@/lib/metadata';
 
 interface Props {
   params: Promise<{ locale: string; slug: string }>;
 }
 
-export const dynamicParams = false;
+// Unknown slugs are not pre-rendered: they reach the page, which calls notFound() inside the locale layout.
+export const dynamicParams = true;
 
 export const generateStaticParams = () => routing.locales.flatMap((locale) => docSlugs.map((slug) => ({ locale, slug })));
 
@@ -24,10 +26,13 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
   const { locale, slug } = await params;
   if (!isDocSlug(slug)) return {};
   const t = await getTranslations({ locale });
-  return {
+  return pageMetadata({
+    locale,
+    path: slug,
     title: `${t(`pages.${slug}.title`)} · ${t('doc.chapterOf', { n: docSlugs.indexOf(slug) + 1, total: docSlugs.length })}`,
     description: t(`pages.${slug}.goal`),
-  };
+    siteName: t('site.name'),
+  });
 };
 
 export default async function DocPage({ params }: Props) {

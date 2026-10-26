@@ -10,6 +10,7 @@ import { BottomBar } from '@/components/shell/bottom-bar';
 import { ChapterNav } from '@/components/shell/chapter-nav';
 import { Rail } from '@/components/shell/rail';
 import { routing } from '@/i18n/routing';
+import { siteUrl } from '@/lib/site-url';
 import { AppProviders } from '@/providers/app-providers';
 
 import '@/styles/global.css';
@@ -28,6 +29,7 @@ export const generateMetadata = async ({ params }: Omit<Props, 'children'>): Pro
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'site' });
   return {
+    metadataBase: siteUrl,
     title: { default: t('name'), template: `%s · ${t('name')}` },
     description: t('description'),
   };
