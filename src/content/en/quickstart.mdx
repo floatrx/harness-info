@@ -56,19 +56,29 @@ harness-demo. The id differs on your machine, and the paths here are shortened. 
 
 ## Open the dashboard
 
-In a second terminal, in the harness-demo folder:
+In a second terminal, in the harness-demo folder, start the dashboard with the fake agent:
 
 ```bash
-pnpm dashboard
+AGENT_CMD="node $PWD/harness/testkit/fake-agent.ts" pnpm dashboard
 ```
 
-Open `http://127.0.0.1:4777` and pick harness-bookmarks. The board updates by itself while the loop runs. The
-[Dashboard](/dashboard) chapter walks through every screen.
+Open `http://127.0.0.1:4777` and pick harness-bookmarks. The line above the board says "3 drafts are yours — Submit
+starts the loop on each." The board updates by itself while the loop runs. The [Dashboard](/dashboard) chapter walks
+through every screen.
+
+<Note title="Start uses the dashboard's environment">
+  The **Start** button runs `harness run` with the environment the dashboard started in. With `AGENT_CMD` set, every unit it runs is the
+  fake agent. Without it, Start runs real Claude units. To check before you press Start, open the project's Agents page: the Invocation card
+  says "A stand-in replaces `claude`" when the fake agent is on.
+</Note>
 
 ## The first task, with zero tokens
 
 The fake agent plays every role from a script. It spends nothing, so you can watch a whole task move before you pay for
 one.
+
+Pick one way: the dashboard or the CLI. On the dashboard, press **Submit** on T-002, press **Start**, press **Approve**
+when the plan waits for you, and watch the card go through implement, qa and judge to done. With the CLI, step by step:
 
 1. Point the harness at the fake agent, and submit T-002:
 
@@ -137,8 +147,8 @@ one.
    The harness made one commit on the task branch, after the gate passed. Nothing else changed.
 
 <Note title="Why every unit took a second">
-  The fake agent answers at once. A real unit runs Claude Code: in the smoke run, a real interview unit took 27 seconds and cost $0.106, and
-  an implement unit takes longer.
+  The fake agent answers at once. A real unit runs Claude Code. On the pilot, the cleanest real task (T-001, with an interview and a
+  prototype) took 7 units and 3 min 21 s of agent time: $1.68 API-equivalent. See [What one task costs](/lifecycle#what-one-task-costs).
 </Note>
 
 ## Switch to real Claude
@@ -147,28 +157,37 @@ Drop the fake agent. First look at what a real unit would receive. Neither comma
 
 ```bash
 unset AGENT_CMD
-harness submit T-001 --project harness-bookmarks
 harness preview T-001 --project harness-bookmarks
 harness agents --check --project harness-bookmarks
 ```
 
-`preview` prints the exact `claude` command line and the full prompt of the next unit:
+T-001 is still a draft, so `preview` shows the spec unit it gets after Submit, and writes nothing to the task. It prints
+the exact `claude` command line and the full prompt:
 
 ```text
+# T-001 is a draft: this is the spec unit it gets after Submit
 # T-001 · stage spec · coordinator writer
 # specialists: writer
 # argv: claude "-p" "--output-format" "stream-json" "--verbose" "--model" "sonnet" "--permission-mode" "dontAsk" …
-# prompt (3762 chars) — sent on stdin:
+# prompt (4563 chars) — sent on stdin:
 
 # Stage: spec — coordinator
 …
 ```
 
 `agents --check` lists the nine agents with their models and stages, and ends with `ok: no drift, no model clash`.
-When both look right, run the loop as before. T-001 is a UI task, so it also stops in `prototype` for your review.
+When both look right, submit T-001 and run the loop:
 
 ```bash
+harness submit T-001 --project harness-bookmarks
 harness run --project harness-bookmarks --once-through
 ```
+
+The run stops each time a column is yours: questions in `needs-input`, the plan in `planned`, and, because T-001 is a
+UI task, the prototype in `prototype`. Answer, approve or accept, on the dashboard or with the CLI, then run again. To
+drive it from the dashboard, restart the dashboard without `AGENT_CMD` first.
+
+`harness stats --project harness-bookmarks` then prints the units, time, tokens and API-equivalent cost per stage and
+per task.
 
 When the example works, [put the harness on your own repository](/adapt).

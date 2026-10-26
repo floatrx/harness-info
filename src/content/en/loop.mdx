@@ -38,7 +38,9 @@ harness run --project bookmarks
 ```
 
 By default the run does not end when the queue is empty: it checks for new work every `supervisor.idlePollSeconds`
-(30 seconds by default) until you stop it. These options change that, and `harness unit` runs a single unit to try
+(30 seconds by default) until you stop it. A human action wakes it at once: a submit, an answer or an approval, from
+the CLI or the dashboard, lands in the human-write ledger, and the idle supervisor watches that file every
+`supervisor.pausePollSeconds` (2 seconds). These options change that, and `harness unit` runs a single unit to try
 things out:
 
 ```bash

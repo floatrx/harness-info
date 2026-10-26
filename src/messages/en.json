@@ -288,7 +288,7 @@
           "work": "The coordinator and the writer work in a fresh claude -p. Every output line goes to unit-0001.jsonl.",
           "check": "The coordinator exits. The runner checks the contracts, moves T-002 to plan, appends a handoff, and exits with code 0.",
           "next": "Unit 2 picks the same task in plan. One unit moves a task one step, and every step gets a fresh context.",
-          "idle": "Nothing is left to take, so the runner exits with code 3. The supervisor checks for new work every 30 seconds. With --once-through it would end the run here."
+          "idle": "Nothing is left to take, so the runner exits with code 3. The supervisor checks for new work every 30 seconds, and at once when you act on a task. With --once-through it would end the run here."
         },
         "pause": {
           "run": "Unit 4 is working on T-003 in implement.",
@@ -375,7 +375,7 @@
       "alt": "The board of the bookmarks project during a qa unit, with the Live dock on the right.",
       "caption": "The board while the loop runs: a qa unit checks T-001.",
       "markers": {
-        "waiting": "The header counts the tasks that wait for you and says why each one waits.",
+        "waiting": "The header counts the tasks that wait for you and says why each one waits. Drafts get a sentence of their own, because only Submit starts the loop on them.",
         "groups": "Thirteen columns in five groups: Define, Plan, Build, Review, Finish. An empty column folds into a narrow rail.",
         "action": "A card shows its stage track. When the card waits for you, it shows one action: Submit, Answer, Approve, Review or Reopen.",
         "running": "The spinner marks the card a unit works on right now. At most one card has it.",

@@ -56,19 +56,29 @@ harness-demo. Id на твоїй машині буде інший, а шляхи
 
 ## Відкрий дашборд
 
-У другому терміналі, в теці harness-demo:
+У другому терміналі, в теці harness-demo, запусти дашборд із fake agent:
 
 ```bash
-pnpm dashboard
+AGENT_CMD="node $PWD/harness/testkit/fake-agent.ts" pnpm dashboard
 ```
 
-Відкрий `http://127.0.0.1:4777` і вибери harness-bookmarks. Дошка оновлюється сама, поки працює цикл. Розділ
+Відкрий `http://127.0.0.1:4777` і вибери harness-bookmarks. Рядок над дошкою каже "3 drafts are yours — Submit starts
+the loop on each.": три чернетки чекають на тебе. Дошка оновлюється сама, поки працює цикл. Розділ
 [Дашборд](/dashboard) показує кожен екран.
+
+<Note title="Start бере оточення дашборду">
+  Кнопка **Start** запускає `harness run` з тим оточенням, у якому стартував дашборд. Із заданим `AGENT_CMD` кожен юніт, який вона запускає,
+  — це fake agent. Без нього Start запускає справжні юніти Claude. Щоб перевірити до натискання Start, відкрий сторінку Agents проєкту:
+  картка Invocation пише "A stand-in replaces `claude`", коли ввімкнено fake agent.
+</Note>
 
 ## Перша задача без жодного токена
 
 Fake agent грає кожну роль за сценарієм. Він нічого не витрачає, тож можна побачити, як рухається ціла задача, ще до
 того, як за неї платити.
+
+Обери один шлях: дашборд або CLI. У дашборді натисни **Submit** на T-002, потім **Start**, потім **Approve**, коли план
+чекатиме на тебе, і дивись, як картка проходить implement, qa і judge до done. У CLI — крок за кроком:
 
 1. Направ harness на fake agent і подай T-002:
 
@@ -137,8 +147,9 @@ Fake agent грає кожну роль за сценарієм. Він нічо
    Harness зробив один коміт у гілку задачі, після того як пройшов гейт. Більше нічого не змінилось.
 
 <Note title="Чому кожен юніт тривав секунду">
-  Fake agent відповідає миттєво. Справжній юніт запускає Claude Code: у smoke-прогоні справжній юніт інтерв'ю тривав 27 секунд і коштував
-  $0.106, а implement-юніт триває довше.
+  Fake agent відповідає миттєво. Справжній юніт запускає Claude Code. На пілоті найчистіша справжня задача (T-001, з інтерв'ю і прототипом)
+  зайняла 7 юнітів і 3 хв 21 с часу агентів: $1.68 в еквіваленті API. Див. [Скільки коштує одна
+  задача](/lifecycle#скільки-коштує-одна-задача).
 </Note>
 
 ## Перейди на справжній Claude
@@ -147,29 +158,37 @@ Fake agent грає кожну роль за сценарієм. Він нічо
 
 ```bash
 unset AGENT_CMD
-harness submit T-001 --project harness-bookmarks
 harness preview T-001 --project harness-bookmarks
 harness agents --check --project harness-bookmarks
 ```
 
-`preview` друкує точний рядок команди `claude` і повний промпт наступного юніта:
+T-001 ще чернетка, тож `preview` показує spec-юніт, який вона отримає після Submit, і нічого не пише в задачу. Він
+друкує точний рядок команди `claude` і повний промпт:
 
 ```text
+# T-001 is a draft: this is the spec unit it gets after Submit
 # T-001 · stage spec · coordinator writer
 # specialists: writer
 # argv: claude "-p" "--output-format" "stream-json" "--verbose" "--model" "sonnet" "--permission-mode" "dontAsk" …
-# prompt (3762 chars) — sent on stdin:
+# prompt (4563 chars) — sent on stdin:
 
 # Stage: spec — coordinator
 …
 ```
 
 `agents --check` показує дев'ять агентів з їхніми моделями й етапами і закінчується рядком
-`ok: no drift, no model clash`. Коли обидва виглядають правильно, запусти цикл, як раніше. T-001 — UI-задача, тож вона
-ще й зупиниться в `prototype` на твоє рев'ю.
+`ok: no drift, no model clash`. Коли обидва виглядають правильно, подай T-001 і запусти цикл:
 
 ```bash
+harness submit T-001 --project harness-bookmarks
 harness run --project harness-bookmarks --once-through
 ```
+
+Прогін зупиняється щоразу, коли колонка твоя: питання в `needs-input`, план у `planned`, а оскільки T-001 — UI-задача,
+ще й прототип у `prototype`. Відповідай, схвалюй чи приймай — у дашборді або через CLI, — потім запусти знову. Щоб
+вести задачу з дашборду, спершу перезапусти його без `AGENT_CMD`.
+
+Потім `harness stats --project harness-bookmarks` друкує юніти, час, токени і вартість в еквіваленті API по етапах і по
+задачах.
 
 Коли приклад працює, [підключи harness до свого репозиторію](/adapt).
