@@ -1,12 +1,13 @@
 ## What you need
 
-| Tool                              | Why                                                                          |
-| --------------------------------- | ---------------------------------------------------------------------------- |
-| Node 26 or newer                  | harness-demo is TypeScript that Node runs directly, with no build step       |
-| pnpm                              | installs harness-demo and the example app                                    |
-| git                               | every project is a git repository, and the loop works on branches            |
-| Claude Code (`claude`), logged in | only for real units, at the end of this page                                 |
-| GitHub CLI (`gh`), logged in      | only for delivery by pull request, described on [Task lifecycle](/lifecycle) |
+| Tool                              | Why                                                                                                                               |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Node 26 or newer                  | harness-demo is TypeScript that Node runs directly, with no build step                                                            |
+| pnpm                              | installs harness-demo and the example app                                                                                         |
+| git                               | every project is a git repository, and the loop works on branches                                                                 |
+| Claude Code (`claude`), logged in | only for real units, at the end of this page                                                                                      |
+| GitHub CLI (`gh`), logged in      | only for delivery by pull request, described on [Task lifecycle](/lifecycle)                                                      |
+| `npx` and Google Chrome           | only for the browser of real qa and prototype units; the example project sets [`app`](/adapt#your-app-for-qa-and-prototype-units) |
 
 ## Get harness-demo
 
@@ -22,7 +23,7 @@ harness self-test
 takes about fifteen seconds and ends with:
 
 ```text
-40/40 cases passed
+41/41 cases passed
 ```
 
 The alias lasts for this shell. Run the commands below from the harness-demo folder.

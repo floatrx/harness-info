@@ -99,8 +99,11 @@ the app does not start, the task's Log says why and the unit runs without it. A 
 died, and logs it.
 
 The runner starts the app before it records the tree for the scope contract, so files the server writes at start are
-not the unit's. It also removes the AI-agent markers from the app's environment: Next.js 16.4 writes `AGENTS.md` into
-a project when it detects an agent, and that stray file would park a read-only unit.
+not the unit's. It also removes the AI-agent markers from the app's environment: Next.js 16.4 writes `AGENTS.md` into a project when it
+detects an agent, and that stray file would park a read-only unit. `NODE_ENV` and Next's own internals (`__NEXT_*`,
+`NEXT_PRIVATE_*`, `NEXT_RUNTIME`, `NEXT_DEPLOYMENT_ID`, `TURBOPACK*`) go too, so an app started from the dashboard's
+supervisor runs as a plain `next dev`. A tracked file the app rewrites while it runs is checked out again after it
+stops, and the task's Log names it.
 
 ### The browser
 

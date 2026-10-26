@@ -156,8 +156,8 @@ way `AGENT_CMD` replaces the agent; the self-tests use it.
   clean run takes 5; the 8 extra units are the lessons the pilot fixed. [#3](https://github.com/floatrx/harness-demo-bookmarks/pull/3) is
   T-001, a UI task, in a clean real-Claude run of 7 units, and [#4](https://github.com/floatrx/harness-demo-bookmarks/pull/4) is T-003,
   where the judge rejected the first round. [#5](https://github.com/floatrx/harness-demo-bookmarks/pull/5) is T-005, a UI task, the first
-  one run with the example's app and a browser. Its body predates the format that marks walked criteria, so every `[found]` line there still
-  reads "for a human to check". All of them stay open, because merging is yours.
+  one run with the example's app and a browser: qa walked all 7 `[found]` criteria in it. Its body predates the format that marks walked
+  criteria, so every `[found]` line there still reads "for a human to check". All of them stay open, because merging is yours.
 </Note>
 
 <Shot name="delivered" plain />
@@ -169,17 +169,19 @@ judge. A UI task adds a prototype round, and an interview adds one more spec uni
 spends no tokens. That is more than a single long session would use. The trade is visibility, since every card rests
 in the column that owns it, and a clean context for every role.
 
-harness-demo measured it on a pilot: three real tasks on the bookmarks example, run by `claude -p` on a subscription
+harness-demo measured it on a pilot: four real tasks on the bookmarks example, run by `claude -p` on a subscription
 login with the default models, gated autonomy and delivery on. Claude passed the human gates on the recommended
-options. All three tasks ended in an open pull request, and nothing was merged.
+options. All four tasks ended in an open pull request, and nothing was merged. T-005 ran after qa and
+the designer got a browser.
 
-| Task                                   | Kind  | What happened                                                                                 | Units | Agent time | Tokens | API-equivalent | Pull request                                                   |
-| -------------------------------------- | ----- | --------------------------------------------------------------------------------------------- | ----- | ---------- | ------ | -------------- | -------------------------------------------------------------- |
-| T-004 Show when a bookmark was added   | logic | the plan sent back once; three harness bugs parked it on the way, each fixed                  | 13    | 6:51       | 25.0k  | $2.30          | [#2](https://github.com/floatrx/harness-demo-bookmarks/pull/2) |
-| T-001 Search box that filters the list | ui    | a 2-question interview, the prototype accepted on round 1, no bounce                          | 7     | 3:21       | 11.1k  | $1.68          | [#3](https://github.com/floatrx/harness-demo-bookmarks/pull/3) |
-| T-003 Make the bookmarks better        | vague | a 4-question interview, the plan sent back once; the judge rejected round 1, round 2 fixed it | 14    | 7:48       | 18.7k  | $2.86          | [#4](https://github.com/floatrx/harness-demo-bookmarks/pull/4) |
+| Task                                   | Kind  | What happened                                                                                                                                                                                 | Units | Agent time | Tokens | API-equivalent | Pull request                                                   |
+| -------------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- | ---------- | ------ | -------------- | -------------------------------------------------------------- |
+| T-004 Show when a bookmark was added   | logic | the plan sent back once; three harness bugs parked it on the way, each fixed                                                                                                                  | 13    | 6:51       | 25.0k  | $2.30          | [#2](https://github.com/floatrx/harness-demo-bookmarks/pull/2) |
+| T-001 Search box that filters the list | ui    | a 2-question interview, the prototype accepted on round 1, no bounce                                                                                                                          | 7     | 3:21       | 11.1k  | $1.68          | [#3](https://github.com/floatrx/harness-demo-bookmarks/pull/3) |
+| T-003 Make the bookmarks better        | vague | a 4-question interview, the plan sent back once; the judge rejected round 1, round 2 fixed it                                                                                                 | 14    | 7:48       | 18.7k  | $2.86          | [#4](https://github.com/floatrx/harness-demo-bookmarks/pull/4) |
+| T-005 Undo after removing a bookmark   | ui    | a 1-question interview; the plan sent back once (it leaned on T-001 and T-004, not in main yet); the designer screenshotted the real toast; qa walked all 7 `[found]` criteria in the browser | 8     | 6:46       | 17.4k  | $2.30          | [#5](https://github.com/floatrx/harness-demo-bookmarks/pull/5) |
 
-Across the pilot, `harness stats` counted 39 units, 5 of them the stand-in's, and 5 parked units: 18:03 of agent time,
-54.7k tokens and $6.83 API-equivalent. Tokens are input plus output. Prompt-cache reads come on top and cost much less.
+Across the pilot, `harness stats` counted 47 units, 5 of them the stand-in's, and 5 parked units: 24:49 of agent time,
+72.1k tokens and $9.13 API-equivalent. Tokens are input plus output. Prompt-cache reads come on top and cost much less.
 On a subscription login the API-equivalent is what the same tokens would cost on the API, not a bill. Every failure
 became a contract or a prompt line with a test; the [lessons](/lessons) page lists the general ones.
