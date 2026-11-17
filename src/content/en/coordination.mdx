@@ -43,6 +43,9 @@ claude -p --output-format stream-json --verbose --model <model> \
 ```
 
 - `--agents` passes the specialists of this stage, merged from the base registry and the project's own.
+- A unit in a task worktree (prototype, implement, qa, judge) also gets `--add-dir <project>/.harness`, right after
+  `--agents`, so it can reach the main checkout's `.harness/` folder. Spec and plan units run in the main checkout and
+  do not need it.
 - `--permission-mode dontAsk` denies a tool that is not allowed, instead of waiting for a human who is not there. In the
   smoke run a `git commit` was denied at once, with no stall, and the denial was listed in the result event's
   `permission_denials`.

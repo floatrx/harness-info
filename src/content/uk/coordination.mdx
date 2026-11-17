@@ -43,6 +43,9 @@ claude -p --output-format stream-json --verbose --model <model> \
 ```
 
 - `--agents` передає спеціалістів цього етапу, злитих із базового реєстру і реєстру проєкту.
+- Юніт у worktree задачі (prototype, implement, qa, judge) отримує ще `--add-dir <project>/.harness`, одразу після
+  `--agents`, щоб дістатися до теки `.harness/` основного checkout. Юніти spec і plan працюють в основному checkout, і їм
+  це не потрібно.
 - `--permission-mode dontAsk` відмовляє в недозволеному інструменті, а не чекає на людину, якої поруч немає. У
   smoke-запуску `git commit` відхилено одразу, без зависання, а відмову записано в `permission_denials` події result.
 - В allowlist `agent.allowedTools` немає git commit і push. Це другий паркан за контрактом scope: коміти — робота runner.
