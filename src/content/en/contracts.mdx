@@ -45,6 +45,9 @@ After an implement unit, the runner checks that:
 The qa, judge and prototype units are read-only. They may write only under `.harness/artifacts/T-NNN/`. A file
 anywhere else fails the unit.
 
+A unit in a worktree is judged in both trees: the worktree by the rules above, and the main checkout by one more. There
+the unit may change only its task file, its artifacts and the journal; a violation starts with `main checkout:`. The runner also refuses a worktree with changes it did not make.
+
 A second fence stands behind this one: the agent's tool allowlist (`agent.allowedTools`) has no git commit and no push.
 Only the runner commits.
 

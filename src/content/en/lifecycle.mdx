@@ -117,8 +117,12 @@ or while a unit works on the task, a second request is refused.
 
 ## Branches and delivery
 
-- The first time a task enters `implementing`, the harness creates the branch `harness/T-NNN-<slug>` from the
-  project's base branch. That branch is the only one the scope contract allows.
+- The first unit that writes code, prototype or implement, creates the branch `harness/T-NNN-<slug>` from the project's base
+  branch, checked out in the task's own worktree, `.harness/worktrees/T-NNN`. That branch is the only one the scope
+  contract allows.
+- Spec and plan units run in the main checkout, which always stays on the base branch. Prototype, implement, qa and
+  judge units run in the task's worktree, and so do the app, the gate and the commits. A done task's worktree is removed
+  when the task is delivered, or at `done` when there is no pull request; the branch stays.
 - After every implement unit with a green gate, the harness commits on that branch.
 - By default delivery is the commit: with `deliver: { pr: false }`, a task ends in `done`.
 - The base branch must be clean before a batch. The supervisor refuses a dirty tree it did not make.

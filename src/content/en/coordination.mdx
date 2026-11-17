@@ -6,7 +6,7 @@ is plain code; only the middle steps involve a model.
 | Step     | Who         | What happens                                                                                              |
 | -------- | ----------- | --------------------------------------------------------------------------------------------------------- |
 | Pick     | runner      | Reads the corpus and takes the next task whose status an agent owns and that is not already running.      |
-| Branch   | runner      | From the implement stage on, switches to the task branch, creating it the first time.                     |
+| Tree     | runner      | Spec and plan run in the main checkout on the base branch; later stages in the task's worktree.           |
 | Snapshot | runner      | Records the branch, the last commit and the dirty files, so it can compare after the unit.                |
 | Start    | runner      | Starts a coordinator with `claude -p`, the stage prompt, and this stage's specialists through `--agents`. |
 | Dispatch | coordinator | Reads the agent registry, picks the specialists this task needs and calls them.                           |
