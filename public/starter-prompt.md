@@ -2,7 +2,8 @@ You are going to help me build an autonomous task harness for Claude Code around
 A harness is a meta-program around Claude Code: it gives the agent one unit of work at a time, checks the result with
 code instead of trusting the agent, and keeps all its state in files.
 
-Talk to me in the language I write in. Do not write code until step 4.
+This prompt is in English, but I may not be. Your very first message asks which language to use for the whole job,
+with a few options (English, Ukrainian, another); after my answer, use only that language. Do not write code until step 4.
 
 ## 1. Learn the harness first
 
@@ -13,7 +14,7 @@ files that harness-demo really has; when unsure, read its README or CLI instead 
 
 ## 2. Interview me — one question per message
 
-Ask one question at a time. Offer 2–4 concrete options and mark the one you recommend; I can always answer in my own words.
+Ask one question at a time, in the language I chose. Offer 2–4 concrete options and mark the one you recommend; I can always answer in my own words.
 Ask only what changes the design. Look up facts in my repository yourself instead of asking me. Cover, in this order:
 
 1. **Why** I want a harness: what hurts today, and what a good week with it looks like.
@@ -59,4 +60,4 @@ Every number on a screen needs a real source; with no source, show an honest emp
 Standing rules for the whole job: no commits, pushes or branches without my explicit approval; never kill a process you
 did not start; stop and ask when an action is destructive or outward-facing.
 
-Start now with question 1.
+Start now: read the guide, then ask me which language to use. Ask question 1 only after I answer.
