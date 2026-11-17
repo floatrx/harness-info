@@ -476,6 +476,30 @@
         "link": "The drawer says it again: Pull request #1, merging is yours. This URL comes from the fake <code>gh</code>, not from a real repository.",
         "track": "The stage track is lit to the end: <code>delivered</code> is the last status."
       }
+    },
+    "home": {
+      "alt": "The Home page of the bookmarks project after a delivery: two tasks wait, two of four are done.",
+      "caption": "Home, for the person who just came back.",
+      "markers": {
+        "headline": "The headline counts the cards whose next action is yours, with the reasons under it. Each tile links to the board filtered to what it counts.",
+        "done": "Done out of all tasks, with a 14-day sparkline and how many got done in the last 7 days.",
+        "running": "The unit in flight. Here nothing runs, so the tile says how to start the loop.",
+        "health": "One cell per recent unit, coloured by its exit and verdict. The title shows the real count.",
+        "spend": "Cost per done task, API-equivalent. With no reported usage it shows an empty state, not zero.",
+        "source": "Every number comes from the task files and <code>handoffs.jsonl</code>, the same data as <code>harness stats</code>."
+      }
+    },
+    "flow": {
+      "alt": "The Flow page while a qa unit checks T-001: the expected path, the trail and the agents of the unit.",
+      "caption": "Flow while a qa unit checks T-001.",
+      "markers": {
+        "expected": "The path a <code>ui</code> task should take. A hollow node has no evidence: human moves such as Submit write no handoff line.",
+        "trail": "What really ran, from <code>handoffs.jsonl</code>. A repeated stage is an extra node: here two prototype rounds.",
+        "now": "The stage in flight. Only this node and the edge into it move.",
+        "unit": "The unit's coordinator and every specialist it dispatched. Click a role to read its agent file.",
+        "roles": "Time by role inside this unit, and the latest progress line.",
+        "last": "The latest finished units, newest first, with their outcome."
+      }
     }
   },
   "og": {

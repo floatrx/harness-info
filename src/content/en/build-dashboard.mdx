@@ -67,7 +67,8 @@ Polling is fine too: refresh every few seconds, but only while the tab is visibl
 
 ## The screens
 
-Each screen answers one question. harness-demo has the first six. The ones marked <Tag>next</Tag> are worth adding once your loop runs every day.
+Each screen answers one question. harness-demo has all of them except the one marked <Tag>next</Tag>, which is worth adding once your loop runs every
+day. Its Home and Flow are on [Dashboard](/dashboard), with screenshots.
 
 | Screen                   | Its goal                         | What is on it                                                                               |
 | ------------------------ | -------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -77,8 +78,8 @@ Each screen answers one question. harness-demo has the first six. The ones marke
 | Live                     | see and steer the run            | the unit in flight, its agent lanes, up next, recent units, start, pause, resume, stop      |
 | Stats                    | is it worth it                   | units, cost, tokens, agent time, per stage and per task                                     |
 | Agents                   | check the setup before a run     | each stage's coordinator and model, the specialists, problems with the agent files          |
-| Home <Tag>next</Tag>     | act on what waits for you        | "N waiting for you" with the reasons, KPI tiles, the inbox                                  |
-| Flow <Tag>next</Tag>     | which stage and which agent, now | one lane per run: the expected chain of stages and roles, with the real trail drawn over it |
+| Home                     | act on what waits for you        | "N waiting for you" with the reasons, KPI tiles, the inbox                                  |
+| Flow                     | which stage and which agent, now | one lane per run: the expected chain of stages and roles, with the real trail drawn over it |
 | Learning <Tag>next</Tag> | decide what the loop learned     | each lesson an agent left, with apply and reject                                            |
 
 ### The home screen
@@ -86,14 +87,14 @@ Each screen answers one question. harness-demo has the first six. The ones marke
 The home screen is for the person who just came back. Its headline is the number of things that wait for a human, with
 the reasons in one line. Under it:
 
-| Widget          | What it shows                                                     | How it is computed                                                    |
-| --------------- | ----------------------------------------------------------------- | --------------------------------------------------------------------- |
-| Done            | done tasks out of all, with a 14-day sparkline and "+N in 7 days" | count of tasks in `done` per day; a day without data repeats the last |
-| Waiting for you | tasks in a status a human owns                                    | count by status owner                                                 |
-| Run health      | one cell per recent unit, coloured by its exit and verdict        | the last N lines of `handoffs.jsonl`                                  |
-| Spend           | cost and tokens per done task                                     | sum of `usage` over the units of done tasks, divided by their count   |
-| Running now     | the task, stage and role in flight                                | `running.json`                                                        |
-| Verdicts        | how often each reviewer said yes and no                           | verdicts per stage from `handoffs.jsonl`                              |
+| Widget          | What it shows                                                                 | How it is computed                                                                                                                         |
+| --------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Done            | done tasks out of all, with a 14-day sparkline and "+N in 7 days"             | count of tasks in `done` per day; a day without data repeats the last                                                                      |
+| Waiting for you | cards whose next action is a human's: submit, answer, approve, review, reopen | count of board cards that wait on a person; not "statuses a human owns": `ready` belongs to a human on paper, but the runner moves it next |
+| Run health      | one cell per recent unit, coloured by its exit and verdict                    | the last N lines of `handoffs.jsonl`                                                                                                       |
+| Spend           | cost and tokens per done task                                                 | sum of `usage` over the units of done tasks, divided by their count                                                                        |
+| Running now     | the task, stage and role in flight                                            | `running.json`                                                                                                                             |
+| Verdicts        | how often each reviewer said yes and no                                       | verdicts per stage from `handoffs.jsonl`                                                                                                   |
 
 ### The rule for every number
 
@@ -192,8 +193,8 @@ rejected share, median and p90 time per task. Show tiles, then tables per stage 
 ### P5 · Home and widgets
 
 ```text
-Add a Home page for the person who just came back: the headline is the number of tasks waiting for a human, with the
-reasons in one line. Under it: Done with a 14-day sparkline, Waiting for you, Run health (one cell per recent unit),
+Add a Home page for the person who just came back: the headline is the number of cards whose next action is a human's (submit, answer, approve, review), not the
+number of tasks in human-owned statuses, with the reasons in one line. Under it: Done with a 14-day sparkline, Waiting for you, Run health (one cell per recent unit),
 Spend per done task, Running now, Verdicts. Every widget names its source; with no data it shows an honest empty state
 that says when data will appear. A widget links to the board filtered to what it counts. Plan first.
 ```

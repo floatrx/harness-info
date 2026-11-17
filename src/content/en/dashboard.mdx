@@ -20,6 +20,14 @@ The first screen lists every project the harness knows. A project is a local git
 
 <Shot name="projects" eager />
 
+## Home
+
+Each project opens on Home. It is for the person who just came back: how many cards wait for you and why, what is
+done, what runs now, and what the work cost. Every tile links to the board filtered to what it counts, for example
+`?owner=human`. How such a page is built is on [Build your own dashboard](/build-dashboard).
+
+<Shot name="home" />
+
 ## Board
 
 One board per project. Each column is a task status, and each card is a task. **New task** opens a two-line draft.
@@ -44,6 +52,14 @@ With `deliver.pr` on, a done task gets one more runner step: a push and a pull r
 sides of it.
 
 <Shot name="delivered" />
+
+## Flow
+
+Flow shows which stage and which agent work on a task now. It draws the path the task's kind should take, lays what
+really ran over it, and lists the coordinator and the specialists of the unit in flight. Click a role to read its agent
+file.
+
+<Shot name="flow" />
 
 ## Live
 
