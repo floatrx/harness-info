@@ -1,7 +1,8 @@
 {
   "site": {
     "name": "harness info",
-    "description": "A step-by-step guide to running Claude Code unattended: what a harness is, the roles, how a coordinator delegates, the loop's contracts, and how to start, pause and stop it."
+    "description": "A step-by-step guide to running Claude Code unattended: what a harness is, the roles, how a coordinator delegates, the loop's contracts, and how to start, pause and stop it.",
+    "author": "Idea and author: <link>Andrew Floatrx</link>"
   },
   "nav": {
     "overview": "Overview",
@@ -16,7 +17,7 @@
     "example": "Example",
     "exampleTip": "Example project: the pull requests the loop opened",
     "githubTip": "This site's code",
-    "chaptersMeta": "10 chapters · ~55 min",
+    "chaptersMeta": "11 chapters · ~65 min",
     "here": "you are here",
     "whereAmI": "Where you are",
     "siteNav": "Site sections",
@@ -60,6 +61,10 @@
       "title": "Your own project",
       "goal": "Point the harness at your repository and tune it to your stack."
     },
+    "build-dashboard": {
+      "title": "Build your own dashboard",
+      "goal": "Build a dashboard around your harness: the architecture, the screens, the numbers, and a prompt for each phase."
+    },
     "lessons": {
       "title": "Lessons",
       "goal": "Skip the expensive mistakes that were already made once."
@@ -89,8 +94,20 @@
   },
   "home": {
     "title": "A harness runs Claude Code unattended",
-    "lead": "A harness is a small program around Claude Code. It gives the agent one unit of work at a time, checks the result with code instead of taking the agent's word, and keeps all its state in files. A run can go for hours, and you can pause it at any time: it stops after the unit in flight.",
+    "lead": "A harness is a meta-program around Claude Code. It gives the agent one unit of work at a time, checks the result with code instead of taking the agent's word, and keeps all its state in files. A run can go for hours, and you can pause it at any time: it stops after the unit in flight.",
     "example": "The example project, live: <link>floatrx/harness-demo-bookmarks</link> — four pull requests opened by the loop, three of them by real Claude.",
+    "starterKicker": "Your own harness",
+    "starterTitle": "Build a harness for your own work",
+    "starterLead": "One prompt for Claude Code. Before it writes any code, it interviews you about the real flow of your work and the people in it. Then the people become agents, the steps become stages, and you get a harness and a dashboard built on the patterns from this guide.",
+    "starterStep1": "Copy the prompt and paste it into Claude Code in your repository.",
+    "starterStep2": "Answer the interview: why you need it, which tasks, your real flow, who takes part.",
+    "starterStep3": "Approve the mapping. Claude sets up the harness, then builds your dashboard phase by phase.",
+    "starterCopy": "Copy the starter prompt",
+    "starterCopied": "Copied",
+    "starterPaste": "Paste it into Claude Code in your repository.",
+    "starterFree": "Free and open source (MIT).",
+    "starterFreeNote": "The guide, the prompt and harness-demo cost nothing. You pay only for your own Claude Code.",
+    "starterShow": "Show the whole prompt (English, Claude will talk in your language)",
     "primary": "Start with the concepts",
     "secondary": "Try it in 5 minutes",
     "flowTitle": "One task, thirteen columns",
@@ -99,9 +116,11 @@
     "agent": "agent",
     "nobody": "end",
     "readTitle": "Read it in this order",
-    "readLead": "Ten pages, about fifty-five minutes. Each one has a single goal, stated at the top.",
+    "readLead": "Eleven pages, about sixty-five minutes. Each one has a single goal, stated at the top.",
     "goal": "Understand what a harness is and pick where to start.",
-    "tocWhat": "What a harness is"
+    "tocWhat": "What a harness is",
+    "learnFirst": "Or learn it first:",
+    "starterStar": "Want to say thanks? A star on GitHub is enough"
   },
   "notFound": {
     "title": "This page does not exist",

@@ -38,7 +38,11 @@ export const BottomBar = () => {
           <Link
             href={`/${next}`}
             data-testid="bottom-next"
-            className="flex h-[50px] min-w-0 flex-1 items-center justify-center gap-2 rounded-panel bg-accent px-3.5 text-[15px] font-semibold text-accent-ink"
+            className={cn(
+              'flex h-[50px] min-w-0 flex-1 items-center justify-center gap-2 rounded-panel px-3.5 text-[15px] font-semibold',
+              // On home the starter prompt is the one primary action, so chapter 1 steps back to the soft style the dock uses there.
+              isHome ? 'bg-accent-soft text-accent-text' : 'bg-accent text-accent-ink',
+            )}
           >
             {isHome ? (
               <span className="truncate">{t('home.primary')}</span>

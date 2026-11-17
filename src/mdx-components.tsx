@@ -12,6 +12,7 @@ import { Note } from '@/components/mdx/note';
 import { Role } from '@/components/mdx/role';
 import { Shot } from '@/components/mdx/shot';
 import { Table } from '@/components/mdx/table';
+import { Tag } from '@/components/mdx/tag';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/cn';
 
@@ -97,6 +98,7 @@ const components: MDXComponents = {
   Role,
   Shot,
   StateMachine,
+  Tag,
 };
 
 export function useMDXComponents(): MDXComponents {

@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 
+import { AuthorLine } from '@/components/shell/author-line';
 import { ChapterList } from '@/components/shell/chapter-list';
 
 /** The chapter column next to the rail. */
@@ -15,6 +16,7 @@ export const ChapterNav = async () => {
         <span className="text-[12.5px] text-ink-mute">{t('chaptersMeta')}</span>
       </div>
       <ChapterList />
+      <AuthorLine className="mt-5 border-t border-line-soft px-2.5 pt-4" />
     </nav>
   );
 };

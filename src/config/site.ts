@@ -4,4 +4,5 @@ export const siteConfig = {
   repo: 'https://github.com/floatrx/harness-info',
   demoRepo: 'https://github.com/floatrx/harness-demo',
   exampleRepo: 'https://github.com/floatrx/harness-demo-bookmarks',
+  authorUrl: 'https://floatrx.net',
 };

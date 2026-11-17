@@ -4,7 +4,7 @@ Claude Code in a terminal is a conversation. You ask, it works, you read the res
 That works well for one task. It does not work for twenty tasks overnight, because you are the part that has to
 stay awake.
 
-A **harness** takes your place in that conversation. It is a small program that starts Claude Code in headless mode
+A **harness** takes your place in that conversation. It is a meta-program that starts Claude Code in headless mode
 (`claude -p`) again and again, gives it one piece of work per start, and checks every result with code before it
 moves on. You still decide what gets built and you still approve the parts that need a human. The harness does the
 waiting, the checking and the bookkeeping.

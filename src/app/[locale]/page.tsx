@@ -4,12 +4,14 @@ import { getTranslations } from 'next-intl/server';
 
 import { TaskFlow } from '@/components/diagrams/task-flow';
 import { GoalLine } from '@/components/doc/goal-line';
+import { StarterBanner } from '@/components/home/starter-banner';
 import { Dock } from '@/components/shell/dock';
 import { TopLine } from '@/components/shell/top-line';
 import { docSlugs } from '@/config/navigation';
 import { siteConfig } from '@/config/site';
 import { Link } from '@/i18n/navigation';
 import { pageMetadata } from '@/lib/metadata';
+import { readStarterPrompt } from '@/lib/starter-prompt';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -23,8 +25,10 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 
 export default async function HomePage() {
   const t = await getTranslations();
+  const prompt = await readStarterPrompt();
   const headings = [
     { id: 'what', text: t('home.tocWhat') },
+    { id: 'start-title', text: t('home.starterTitle') },
     { id: 'read', text: t('home.readTitle') },
     { id: 'flow', text: t('home.flowTitle') },
   ];
@@ -56,21 +60,26 @@ export default async function HomePage() {
               ),
             })}
           </p>
-          <div className="mt-5 hidden flex-wrap gap-2.5 min-[900px]:flex">
-            <Link
-              href={`/${docSlugs[0]}`}
-              className="inline-flex h-10 items-center gap-2 rounded-btn bg-accent px-[18px] text-[14.5px] font-semibold text-accent-ink transition-[background-color,transform] hover:bg-accent-hover active:scale-[0.97]"
-            >
-              {t('home.primary')} →
-            </Link>
-            <Link
-              href="/quickstart"
-              className="inline-flex h-10 items-center rounded-btn border border-line px-3.5 text-[13.5px] font-medium text-ink transition-colors hover:bg-surface-2"
-            >
-              {t('home.secondary')}
-            </Link>
-          </div>
         </section>
+
+        <StarterBanner prompt={prompt} />
+
+        {/* Phones get chapter 1 from the bottom bar, so this row is for wide screens only. */}
+        <div className="mt-4 hidden max-w-[760px] flex-wrap items-center gap-2.5 min-[900px]:flex">
+          <span className="text-[13.5px] text-ink-mute">{t('home.learnFirst')}</span>
+          <Link
+            href={`/${docSlugs[0]}`}
+            className="inline-flex min-h-10 items-center rounded-btn border border-line px-3.5 text-[13.5px] font-medium text-ink transition-colors hover:bg-surface-2"
+          >
+            {t('home.primary')} →
+          </Link>
+          <Link
+            href="/quickstart"
+            className="inline-flex min-h-10 items-center rounded-btn border border-line px-3.5 text-[13.5px] font-medium text-ink transition-colors hover:bg-surface-2"
+          >
+            {t('home.secondary')}
+          </Link>
+        </div>
 
         <section aria-labelledby="read" className="mt-9 max-w-[760px]">
           <div className="mb-2.5 flex flex-wrap items-baseline justify-between gap-3">

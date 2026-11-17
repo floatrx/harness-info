@@ -1,0 +1,229 @@
+<Note title="Two ways in">
+  Building a harness for your own work from scratch? Copy the [starter prompt](/#start): it interviews you first and then follows this page.
+  Already running harness-demo? Read on, and paste the prompts at the end into Claude Code one phase at a time.
+</Note>
+
+## Why a dashboard
+
+A harness runs while you are away. When you come back, you need three answers fast: what waits for you, what is running
+now, and whether the work was worth what it cost. A terminal gives you the facts, one command at a time. A dashboard
+puts them on one screen, so you can trust a run you did not watch.
+
+harness-demo ships a dashboard, described on [Dashboard](/dashboard). This page explains how such a dashboard is built,
+so you can build one around your own flow. The architecture comes from harness-demo. The screens and widgets beyond it
+come from a larger team dashboard built on the same harness ideas.
+
+## The architecture
+
+The harness keeps all its state in files. The dashboard owns no state of its own: it reads those files, and every
+button writes the same files the CLI writes.
+
+| Layer      | What it does                                                          | Rule                                                             |
+| ---------- | --------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| files      | `.harness/` in each project, and the project registry `projects.json` | the only source of truth                                         |
+| read model | parses task files and the trace into screen data                      | import the harness's own parser and transitions, never copy them |
+| writes     | one module that every button goes through                             | the same transitions the CLI allows, checked before every write  |
+| live       | a stream that tells the page when the files changed                   | send a new snapshot only when its hash changes                   |
+| screens    | server-rendered pages, with client parts only where you click or drag | each screen has one goal, written under its title                |
+
+The rules in the last column carry the design. A dashboard that re-implements the state machine drifts from the CLI on
+the first change. A dashboard with its own database disagrees with the files after the first crash.
+
+### What it reads
+
+These are the files harness-demo writes. A dashboard for another harness reads its equivalents.
+
+| File                             | What it holds                                                                                                 | Feeds                   |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `.harness/tasks/T-NNN.md`        | one task: frontmatter (`id`, `title`, `status`, `kind`, `scope`, `bounces`, `branch`, `pr`…) and its sections | board, drawer           |
+| `.harness/trace/running.json`    | the unit in flight: task, stage, role, unit number, start time                                                | live, "working" states  |
+| `.harness/trace/handoffs.jsonl`  | one line per finished unit: stage, exit code, verdict, reason, commit, and `usage` (tokens, cost, duration)   | stats, history, live    |
+| `.harness/trace/unit-NNNN.jsonl` | the stream of one unit, with a timestamp on every line                                                        | live trace, agent lanes |
+| `.harness/trace/progress.log`    | the supervisor's log                                                                                          | live                    |
+| `.harness/trace/PAUSE`, `STOP`   | their existence is the state                                                                                  | supervisor controls     |
+| `.harness/artifacts/T-NNN/`      | prototype images and screenshots                                                                              | drawer                  |
+| `.harness/config.json`           | the project's settings                                                                                        | agents, settings        |
+
+### How it writes
+
+Every button goes through one write module, and every write passes the same guards, in this order:
+
+1. The request carries a custom header, so a page on another site cannot post to your dashboard.
+2. The project and the task exist.
+3. The task is not the one a unit is working on now. Otherwise the answer is 409.
+4. The move is one the harness allows a human to make. The drag targets on the board come from the same list.
+
+The write itself goes to a temporary file and is then renamed over the task file, so a crash never leaves half a file.
+Each human write is also logged with the file and its hash, so a unit can tell your edit from its own. Start, pause and stop write the same files as the
+CLI; the dashboard never signals a process.
+
+### How it stays live
+
+The server checks the files every second, hashes a small snapshot, and sends it over Server-Sent Events only when the
+hash changes, with a heartbeat every 15 seconds. The page refreshes its server data when the board part of the snapshot
+changes. The snapshot carries roles, tool names and file basenames only, never file contents.
+
+Polling is fine too: refresh every few seconds, but only while the tab is visible.
+
+## The screens
+
+Each screen answers one question. harness-demo has the first six. The ones marked <Tag>next</Tag> are worth adding once your loop runs every day.
+
+| Screen                   | Its goal                         | What is on it                                                                               |
+| ------------------------ | -------------------------------- | ------------------------------------------------------------------------------------------- |
+| Projects                 | pick the project                 | one row per project: tasks, how many wait for you, the unit running, paused or not          |
+| Board                    | find a task and move it          | one column per status, cards with owner, stage track and PR link; filters in the URL        |
+| Task drawer              | decide on one task               | tabs: interview, spec and criteria, plan, prototype, log; the approve and revise buttons    |
+| Live                     | see and steer the run            | the unit in flight, its agent lanes, up next, recent units, start, pause, resume, stop      |
+| Stats                    | is it worth it                   | units, cost, tokens, agent time, per stage and per task                                     |
+| Agents                   | check the setup before a run     | each stage's coordinator and model, the specialists, problems with the agent files          |
+| Home <Tag>next</Tag>     | act on what waits for you        | "N waiting for you" with the reasons, KPI tiles, the inbox                                  |
+| Flow <Tag>next</Tag>     | which stage and which agent, now | one lane per run: the expected chain of stages and roles, with the real trail drawn over it |
+| Learning <Tag>next</Tag> | decide what the loop learned     | each lesson an agent left, with apply and reject                                            |
+
+### The home screen
+
+The home screen is for the person who just came back. Its headline is the number of things that wait for a human, with
+the reasons in one line. Under it:
+
+| Widget          | What it shows                                                     | How it is computed                                                    |
+| --------------- | ----------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Done            | done tasks out of all, with a 14-day sparkline and "+N in 7 days" | count of tasks in `done` per day; a day without data repeats the last |
+| Waiting for you | tasks in a status a human owns                                    | count by status owner                                                 |
+| Run health      | one cell per recent unit, coloured by its exit and verdict        | the last N lines of `handoffs.jsonl`                                  |
+| Spend           | cost and tokens per done task                                     | sum of `usage` over the units of done tasks, divided by their count   |
+| Running now     | the task, stage and role in flight                                | `running.json`                                                        |
+| Verdicts        | how often each reviewer said yes and no                           | verdicts per stage from `handoffs.jsonl`                              |
+
+### The rule for every number
+
+Every number on a screen has a source you can name. A widget whose source has no data yet shows an honest empty state
+that says when the data will appear, for example "Cost appears after the first real unit". It never shows zero, and it
+never shows a made-up value. harness-demo's stats follow this: a cost that no unit reported is unknown, not zero.
+
+## The numbers
+
+Keep the analytics in one pure function over the trace, with tests. That way every screen shows the same number for
+the same thing.
+
+| Metric         | Formula                                                                       |
+| -------------- | ----------------------------------------------------------------------------- |
+| units          | lines in `handoffs.jsonl` that carry a unit number                            |
+| ok and stops   | units with exit 0, and units with exit 1                                      |
+| tokens         | input + output; cache reads counted apart, because they cost far less         |
+| cost           | the sum of `usage.costUsd`; unknown when no unit reported it                  |
+| duration       | `usage.durationMs`, or the time between the unit's start and its handoff line |
+| done rate      | tasks that reached `done` ÷ tasks that left `draft`                           |
+| judge rejected | `REJECTED` verdicts ÷ all judge verdicts                                      |
+| time per task  | the median and the 90th percentile, not the mean: one stuck task skews a mean |
+
+## Motion that carries information
+
+A dashboard you leave open on a second screen should tell you what changed without making you read. Motion does that,
+when it means something:
+
+- **One motion means "working".** Only the unit in flight animates. harness-demo and this site use the Claude Code
+  spinner for it; everything else on the screen stays still, so your eye goes to the one live thing.
+- **Draw the expected path first.** In a flow lane, draw the stages and roles a task should pass as hollow nodes, then
+  fill the ones that really ran. Never draw a step that did not happen. A retry is an extra node.
+- **A finish is an event.** When a run ends, flash its lane once, fold it away, and slide the result into "last runs".
+  A finish you can miss is a finish nobody notices.
+- **Numbers count up, bars grow.** On first render only, so a refresh does not replay them. Give each animated item a
+  stable key (task, stage and start time) so a server refresh never restarts it.
+- **One set of motion tokens.** Three durations, one easing curve, two springs, one stagger step, all in one file.
+- **Respect reduced motion** in CSS, for the whole app at once.
+
+## The stack
+
+| Part       | Choice                               | Why                                                                  |
+| ---------- | ------------------------------------ | -------------------------------------------------------------------- |
+| framework  | Next.js 16, App Router               | server components read the files directly; route handlers for writes |
+| components | HeroUI 3, or the kit you already use | accessible tables, tabs, drawers and modals out of the box           |
+| styling    | Tailwind 4, tokens in `@theme`       | one place for colours, radii and spacing                             |
+| motion     | motion (Framer Motion)               | springs, layout animations and exit animations for lanes and drawers |
+| board      | @dnd-kit                             | drag and drop that works with a keyboard                             |
+| markdown   | react-markdown + remark-gfm          | task sections and agent files render as they are                     |
+
+Bind the server to `127.0.0.1`. A local dashboard has no login, so it must never listen on a network address.
+
+## Build it phase by phase
+
+Run one phase per session, and read what Claude built before the next. Each prompt asks Claude to write the phase plan
+first, so you can stop a wrong turn before it costs anything.
+
+### P1 · Read model
+
+```text
+Build the read model of a dashboard for my harness. Read https://harness-info.vercel.app/en/build-dashboard first.
+Create a Next.js 16 app (App Router, Tailwind 4, HeroUI 3, motion) in dashboard/, bound to 127.0.0.1.
+Write a server-only module that reads the project registry and each project's .harness/ files: tasks, running.json,
+handoffs.jsonl, progress.log, PAUSE and STOP. Import the harness's own parser and transitions; never copy them.
+Cover the module with tests on a fixture .harness/ folder. Write the plan to a file and show it to me before any code.
+```
+
+### P2 · Board and task drawer
+
+```text
+Add the Projects page and the Board to the dashboard: one column per task status, cards with the owner, a stage track
+and the PR link, and a drawer opened by ?t=T-NNN with tabs for interview, spec, plan, prototype and log.
+Put every write in one module with these guards, in order: a custom request header, project and task exist, the task is
+not the one running (409), the move is a human transition the harness allows. Write atomically (temp file + rename).
+Drag targets come from the same list of human transitions. Plan first, then build, then show me the board at 390 px.
+```
+
+### P3 · Live and flow
+
+```text
+Add live updates and the Live page. A route handler streams Server-Sent Events: check the files every second, send a
+snapshot only when its hash changes, heartbeat every 15 s, roles and tool names only, never file contents.
+The Live page shows the unit in flight, its agent lanes, up next and recent units, and Start, Pause, Resume and Stop
+that write the same files as the CLI. Add a Flow view: one lane per run, the expected chain of stages and roles drawn
+hollow, the real trail filled over it, never a step that did not run. Plan first.
+```
+
+### P4 · Stats
+
+```text
+Add the Stats page. Put every metric in one pure, tested function over handoffs.jsonl: units, ok and stops, tokens
+(input + output, cache reads apart), cost (unknown when no unit reported it, never zero), duration, done rate, judge
+rejected share, median and p90 time per task. Show tiles, then tables per stage and per task. Plan first.
+```
+
+### P5 · Home and widgets
+
+```text
+Add a Home page for the person who just came back: the headline is the number of tasks waiting for a human, with the
+reasons in one line. Under it: Done with a 14-day sparkline, Waiting for you, Run health (one cell per recent unit),
+Spend per done task, Running now, Verdicts. Every widget names its source; with no data it shows an honest empty state
+that says when data will appear. A widget links to the board filtered to what it counts. Plan first.
+```
+
+### P6 · Motion polish
+
+```text
+Polish the dashboard's motion. Create one motion tokens file: three durations, one easing, two springs, one stagger.
+Only the unit in flight animates. A finished run flashes its lane once, folds it away and slides into "last runs".
+KPI numbers count up and bars grow on first render only; give animated items stable keys so a refresh never replays
+them. Respect prefers-reduced-motion in CSS for the whole app. Show me a before and after.
+```
+
+### P7 · Team mode, when you need it
+
+A local dashboard is enough for one developer. When a team shares one harness, the larger dashboard behind this page
+adds these parts. Build them only when you have that problem:
+
+- **A database for human input only.** Answers, reviews, decisions, a job queue and an audit log go to Postgres. Tasks
+  and agent files stay in git, indexed into cache tables tagged with the commit they came from.
+- **A worker on the machine that runs the loop.** It polls one endpoint with a token every few seconds, sends a
+  heartbeat and an allowlisted snapshot, and takes jobs. A job is claimed by an update that must hit exactly one row, so
+  two workers never take the same job. The worker writes decisions back to git and reports the commit.
+- **Sign-in for the team only**, and a one-click local sign-in that works only on loopback and never in production.
+- **A ship button that explains itself.** It runs the push and the pull request as a job, and while it cannot run (a
+  run in progress, a dirty tree, the wrong branch), it is disabled with the reason written under it.
+
+```text
+Turn my local harness dashboard into a team one. Read the "P7 · Team mode" section of
+https://harness-info.vercel.app/en/build-dashboard. Keep files as the source of truth for tasks; add Postgres only for
+human input and an audit log; add a worker that polls one token-protected endpoint and claims jobs atomically; add
+sign-in limited to my team. Interview me about hosting and who may sign in before you write the plan.
+```
