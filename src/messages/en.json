@@ -306,7 +306,7 @@
       "steps": {
         "normal": {
           "lock": "harness run starts the supervisor. It takes the lock .harness/trace/supervisor.lock, so a second loop on this checkout refuses to start.",
-          "pick": "The runner starts unit 1. It picks T-002 in spec, records it in running.json, and writes the stage's specialists to unit-0001.agents.json.",
+          "pick": "The runner starts unit 1. It picks T-002 in spec, records it in running/0001.json, and writes the stage's specialists to unit-0001.agents.json.",
           "work": "The coordinator and the writer work in a fresh claude -p. Every output line goes to unit-0001.jsonl.",
           "check": "The coordinator exits. The runner checks the contracts, moves T-002 to plan, appends a handoff, and exits with code 0.",
           "next": "Unit 2 picks the same task in plan. One unit moves a task one step, and every step gets a fresh context.",
@@ -499,6 +499,19 @@
         "unit": "The unit's coordinator and every specialist it dispatched. Click a role to read its agent file.",
         "roles": "Time by role inside this unit, and the latest progress line.",
         "last": "The latest finished units, newest first, with their outcome."
+      }
+    },
+    "learning": {
+      "alt": "The Learning page of the bookmarks project: one candidate, two tasks parked for the same stray file, with a pre-filled rule.",
+      "caption": "Learning: the same contract stopped two tasks.",
+      "markers": {
+        "count": "How many candidates wait for a decision, and how many rules every unit already reads.",
+        "tabs": "New, Applied and Rejected. Undo on an applied rule sends it back to New.",
+        "candidate": "A candidate found in <code>handoffs.jsonl</code>: here one violation parked two tasks. A tool denied in three units, a verdict that sent one task back twice, or a note in <code>JOURNAL.md</code> make candidates too.",
+        "evidence": "The evidence: which tasks, which units, what the contract said.",
+        "rule": "A draft rule you edit. Apply writes it to <code>.harness/LESSONS.md</code>, and every later unit reads it in its Memory.",
+        "decide": "Reject records the key, so this candidate is never proposed again.",
+        "source": "The CLI does the same: <code>harness lessons</code>, <code>apply</code>, <code>reject</code> and <code>withdraw</code>."
       }
     }
   },

@@ -64,6 +64,25 @@ Flow показує, яка стадія і який агент працюють
 
 <Shot name="flow" />
 
+## Learning
+
+Learning перетворює повторні збої на правила. Вона знаходить кандидатів у трейсі: одне порушення, що запаркувало дві
+задачі, інструмент, якому відмовили в трьох юнітах, вердикт, що двічі повернув одну задачу, і нотатки, які агенти
+лишають у `JOURNAL.md`. Ти редагуєш чернетку правила і тиснеш Apply; воно йде в `.harness/LESSONS.md`, і кожен
+наступний юніт читає його у своїй Memory. Reject записує кандидата, щоб його більше не пропонували; Undo знімає
+застосоване правило. CLI робить те саме:
+
+```bash
+harness lessons --project bookmarks
+harness lessons apply <key> "<rule text>" --project bookmarks
+harness lessons reject <key> --project bookmarks
+harness lessons withdraw L-001 --project bookmarks
+```
+
+Рішення, ухвалене під час роботи юніта, безпечне: журнал записів пропускає `LESSONS.md` так само, як файл задачі.
+
+<Shot name="learning" />
+
 ## Live
 
 Live trace показує, що робить юніт, поки він працює, і що зробив кожен попередній.

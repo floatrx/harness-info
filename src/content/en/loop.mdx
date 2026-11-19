@@ -167,7 +167,10 @@ contract excuses a task file whose content matches that record. An approve made 
 kept. Inside a unit, the human CLI actions refuse to run, so an agent cannot pose as you. The ledger stops mistakes,
 not an agent that forges the ledger itself.
 
-The same reason allows only one loop per checkout. Each task already has its own git worktree for its code units, so the main checkout never leaves the base branch; running several units at once is the next step and is not in the loop yet.
+The same reason allows only one loop per checkout. Each task already has its own git worktree for its code units, so the main checkout never leaves the base branch; with `limits.parallel` above 1, up to that many units run at
+once, one per task. Code units run side by side in their worktrees; the main checkout holds at most one spec or plan
+unit at a time. Pause, stop and a deadline stop new starts, and the units in flight finish first. The default is 1,
+which keeps one unit at a time.
 
 ## Watching a run
 
@@ -233,13 +236,13 @@ Everything the loop knows about itself is in `.harness/trace/`. The project's `.
 | `supervisor.lock`       | held by the running supervisor; a second loop refuses to start                                                                    |
 | `PAUSE`                 | present = pause at the next unit boundary                                                                                         |
 | `STOP`                  | present = stop at the next unit boundary                                                                                          |
-| `running.json`          | the task a unit is working on right now                                                                                           |
+| `running/<unit>.json`   | one file per unit in flight: its task, stage, role and start time                                                                 |
 | `progress.log`          | the supervisor's log                                                                                                              |
 | `supervisor.out`        | the supervisor's output when the dashboard started the run                                                                        |
 | `handoffs.jsonl`        | what each unit handed to the next: start time, verdict, tokens, cost and any permission denials                                   |
 | `unit-seq`              | the counter that numbers units                                                                                                    |
 | `unit-NNNN.jsonl`       | one file per unit: the agent's stream-json output, each line stamped with `harness_ts`; the trace contract finds the verdict here |
-| `human-writes.jsonl`    | every human write to a task file, with its hash; the scope contract excuses a matching file                                       |
+| `human-writes.jsonl`    | every write to a task file by a human or the runner (`who`), with its hash; the scope contract excuses a matching file            |
 | `unit-NNNN.agents.json` | the specialists passed to that unit with `--agents`                                                                               |
 | `unit-NNNN.app.json`    | the app the runner started for that unit: its pid, port and owner; removed once the app stops                                     |
 | `unit-NNNN.app.log`     | that app's output                                                                                                                 |

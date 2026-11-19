@@ -61,6 +61,24 @@ file.
 
 <Shot name="flow" />
 
+## Learning
+
+Learning turns repeated failures into rules. It finds candidates in the trace: one violation that parked two tasks, a
+tool denied in three units, a verdict that sent one task back twice, and the notes agents leave in `JOURNAL.md`. You
+edit the draft rule and press Apply; it goes into `.harness/LESSONS.md`, and every later unit reads it in its Memory.
+Reject records the candidate so it is never proposed again; Undo withdraws an applied rule. The CLI does the same:
+
+```bash
+harness lessons --project bookmarks
+harness lessons apply <key> "<rule text>" --project bookmarks
+harness lessons reject <key> --project bookmarks
+harness lessons withdraw L-001 --project bookmarks
+```
+
+A decision made while a unit runs is safe: the write ledger excuses `LESSONS.md` the way it excuses a task file.
+
+<Shot name="learning" />
+
 ## Live
 
 Live trace shows what a unit does while it runs, and what every earlier unit did.

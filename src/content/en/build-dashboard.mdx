@@ -36,7 +36,7 @@ These are the files harness-demo writes. A dashboard for another harness reads i
 | File                             | What it holds                                                                                                 | Feeds                   |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------- |
 | `.harness/tasks/T-NNN.md`        | one task: frontmatter (`id`, `title`, `status`, `kind`, `scope`, `bounces`, `branch`, `pr`…) and its sections | board, drawer           |
-| `.harness/trace/running.json`    | the unit in flight: task, stage, role, unit number, start time                                                | live, "working" states  |
+| `.harness/trace/running/*.json`  | one file per unit in flight: task, stage, role, unit number, start time                                       | live, "working" states  |
 | `.harness/trace/handoffs.jsonl`  | one line per finished unit: stage, exit code, verdict, reason, commit, and `usage` (tokens, cost, duration)   | stats, history, live    |
 | `.harness/trace/unit-NNNN.jsonl` | the stream of one unit, with a timestamp on every line                                                        | live trace, agent lanes |
 | `.harness/trace/progress.log`    | the supervisor's log                                                                                          | live                    |
@@ -67,20 +67,22 @@ Polling is fine too: refresh every few seconds, but only while the tab is visibl
 
 ## The screens
 
-Each screen answers one question. harness-demo has all of them except the one marked <Tag>next</Tag>, which is worth adding once your loop runs every
-day. Its Home and Flow are on [Dashboard](/dashboard), with screenshots.
+Each screen answers one question. harness-demo has all of them except the ones marked <Tag>next</Tag>, which are worth adding once your loop runs
+every day. Its Home, Flow and Learning are on [Dashboard](/dashboard), with screenshots.
 
-| Screen                   | Its goal                         | What is on it                                                                               |
-| ------------------------ | -------------------------------- | ------------------------------------------------------------------------------------------- |
-| Projects                 | pick the project                 | one row per project: tasks, how many wait for you, the unit running, paused or not          |
-| Board                    | find a task and move it          | one column per status, cards with owner, stage track and PR link; filters in the URL        |
-| Task drawer              | decide on one task               | tabs: interview, spec and criteria, plan, prototype, log; the approve and revise buttons    |
-| Live                     | see and steer the run            | the unit in flight, its agent lanes, up next, recent units, start, pause, resume, stop      |
-| Stats                    | is it worth it                   | units, cost, tokens, agent time, per stage and per task                                     |
-| Agents                   | check the setup before a run     | each stage's coordinator and model, the specialists, problems with the agent files          |
-| Home                     | act on what waits for you        | "N waiting for you" with the reasons, KPI tiles, the inbox                                  |
-| Flow                     | which stage and which agent, now | one lane per run: the expected chain of stages and roles, with the real trail drawn over it |
-| Learning <Tag>next</Tag> | decide what the loop learned     | each lesson an agent left, with apply and reject                                            |
+| Screen                   | Its goal                           | What is on it                                                                                   |
+| ------------------------ | ---------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Projects                 | pick the project                   | one row per project: tasks, how many wait for you, the unit running, paused or not              |
+| Board                    | find a task and move it            | one column per status, cards with owner, stage track and PR link; filters in the URL            |
+| Task drawer              | decide on one task                 | tabs: interview, spec and criteria, plan, prototype, log; the approve and revise buttons        |
+| Live                     | see and steer the run              | the unit in flight, its agent lanes, up next, recent units, start, pause, resume, stop          |
+| Stats                    | is it worth it                     | units, cost, tokens, agent time, per stage and per task                                         |
+| Agents                   | check the setup before a run       | each stage's coordinator and model, the specialists, problems with the agent files              |
+| Home                     | act on what waits for you          | "N waiting for you" with the reasons, KPI tiles, the inbox                                      |
+| Flow                     | which stage and which agent, now   | one lane per run: the expected chain of stages and roles, with the real trail drawn over it     |
+| Learning                 | decide what the loop learned       | candidates from repeated failures and agents' notes; apply writes a rule every later unit reads |
+| Settings <Tag>next</Tag> | can this machine run the next step | one row per step, green or red, with the check that blocks it; then every check with its fix    |
+| Cycle <Tag>next</Tag>    | take one cycle from open to finish | a stepper with one primary action per step and the reason beside a disabled one                 |
 
 ### The home screen
 
@@ -93,7 +95,7 @@ the reasons in one line. Under it:
 | Waiting for you | cards whose next action is a human's: submit, answer, approve, review, reopen | count of board cards that wait on a person; not "statuses a human owns": `ready` belongs to a human on paper, but the runner moves it next |
 | Run health      | one cell per recent unit, coloured by its exit and verdict                    | the last N lines of `handoffs.jsonl`                                                                                                       |
 | Spend           | cost and tokens per done task                                                 | sum of `usage` over the units of done tasks, divided by their count                                                                        |
-| Running now     | the task, stage and role in flight                                            | `running.json`                                                                                                                             |
+| Running now     | the task, stage and role in flight                                            | `running/*.json`                                                                                                                           |
 | Verdicts        | how often each reviewer said yes and no                                       | verdicts per stage from `handoffs.jsonl`                                                                                                   |
 
 ### The rule for every number
@@ -157,7 +159,7 @@ first, so you can stop a wrong turn before it costs anything.
 ```text
 Build the read model of a dashboard for my harness. Read https://harness-info.vercel.app/en/build-dashboard first.
 Create a Next.js 16 app (App Router, Tailwind 4, HeroUI 3, motion) in dashboard/, bound to 127.0.0.1.
-Write a server-only module that reads the project registry and each project's .harness/ files: tasks, running.json,
+Write a server-only module that reads the project registry and each project's .harness/ files: tasks, running/*.json,
 handoffs.jsonl, progress.log, PAUSE and STOP. Import the harness's own parser and transitions; never copy them.
 Cover the module with tests on a fixture .harness/ folder. Write the plan to a file and show it to me before any code.
 ```
@@ -227,4 +229,105 @@ Turn my local harness dashboard into a team one. Read the "P7 · Team mode" sect
 https://harness-info.vercel.app/en/build-dashboard. Keep files as the source of truth for tasks; add Postgres only for
 human input and an audit log; add a worker that polls one token-protected endpoint and claims jobs atomically; add
 sign-in limited to my team. Interview me about hosting and who may sign in before you write the plan.
+```
+
+## Next level: a work cycle
+
+Once the loop runs every day for a team, single tasks stop being the unit you think in. You pull a set of work, decide
+each item, group them, run them, report and ship one pull request. The larger dashboard behind this page grew a **work
+cycle** for that: open → pull → triage → select → batch → run → report → finish. These are its patterns. None of them
+is in harness-demo yet, so build them only when you have the problem.
+
+### The rules every step shares
+
+- **The model proposes, a person confirms, the worker executes.** The server never runs git, files or a model; a
+  worker on the loop's machine does, as a job.
+- **Code decides where code can.** Spend tokens only where judgment is needed.
+- **Anything outward-facing shows a preview first.** A person edits it and presses the button; the audit log keeps the
+  exact text that went out.
+- **A disabled button says why,** next to it, in words.
+- **Failure reasons are codes that code writes,** never a model's text. Each code maps to two lines on screen: what was
+  found and how to fix it.
+- **Git moves forward only.** Fast-forward, nothing forced, nothing merged by the harness; a conflict goes to a person.
+- **The data boundary is an allowlist.** Ids, states, codes and counts cross from the worker to the server. Paths,
+  command output, item text, screenshots and video stay on the worker.
+
+### Settings with a preflight
+
+**Goal:** know before Start which steps this machine can run. A cycle that fails halfway because a repository was
+dirty or a CLI was not logged in costs more than any check.
+
+- The worker measures every check once a minute (repositories present, clean and up to date, CLI logins, required
+  config keys) and sends only an id, a state and a count.
+- Each check names the steps it is **required for**. A red check blocks only those steps, an amber check never blocks,
+  and no measurement at all blocks every step: fail closed.
+- The page answers first, one row per step, then lists the checks by group with the fix for each.
+- **Classify a check by what the next step will do.** A tracked edit on the checked-out integration branch is red,
+  because opening a cycle fast-forwards that branch. An untracked file stays amber.
+
+### A cycle page with a stepper
+
+**Goal:** one page from open to finish. Each step has one primary action; a disabled one carries its reason; passed
+steps are links. The server checks every move: one step forward, or one step back where redoing is safe. On a phone the
+stepper becomes one line, "Step n of 8 · current · next: …", over eight segments.
+
+### Triage: the agent proposes, a person confirms
+
+**Goal:** decide each item before any work starts. A triage agent writes one proposal per item, each with a reason:
+close (already done), park (a question for whoever asked), feature (too big, gets its own spec) or work. Code refuses
+a malformed proposal, such as a park without a question. Confirming takes one click; **overriding needs a written
+reason**. Parked items come back when someone pastes the answer, with the answer next to the question.
+
+### Batches by code, not by a model
+
+**Goal:** reviewable groups. Link items that touch the same module and file, share a pattern or duplicate each other,
+take connected groups, and split a group above a fixed size along its links. This is deterministic and spends no
+tokens; in one measurement 37 items became 5 batches. A person can move items and approves each batch. The cycle still
+ends in **one** pull request, because many small ones mean many rounds of merging the base branch in.
+
+### Pull request status per repository
+
+**Goal:** see whether every repository's pull request can merge, without opening the code host. The worker measures
+commits ahead of and behind the base branch and the pull request's state, checks and review. An **Actualize** button
+queues a local merge of the base branch. It never pushes, and it refuses a dirty tree or a busy loop; anything it
+cannot finish is reported as a conflict for a person.
+
+### Reports the server writes from data it holds
+
+**Goal:** hand the outcome to the team and to whoever asked for the work, without writing it by hand. The server builds
+the cycle report (counts, pull requests, each batch's items with their shipping commit) and a brief of the open
+questions from data it already has. No model runs. Every press writes a new version, so a document already sent stays
+readable. Add the **cost per batch**: turns, time and tokens summed over its items since the cycle opened, with "—"
+where no transcript was read.
+
+### A message to the team, preview first
+
+**Goal:** announce the cycle without leaving the dashboard. Drafts are built from counts and links; the person edits
+and presses Send; the server posts exactly that text. Without the chat keys the button is off and names the keys to set.
+
+### A phrase becomes an editable plan
+
+**Goal:** turn "pull module X, close what is done, write the reports" into presses. The worker runs a model with no
+tools and no settings, in an empty folder, against a strict JSON schema; the answer is a plan of steps, each with a
+reason. The server re-checks it: steps in cycle order, names that exist. **Applying needs a confirmation, and every
+dangerous step keeps its own press** (approving a batch, sending a message, finishing). One phrase costs about 1.4k
+tokens.
+
+### Small lessons from the same build
+
+- A health probe for a local server must try both `127.0.0.1` and `::1`: a dev server on `localhost` may listen on IPv6
+  only and read as down.
+- A grid column that holds long text needs `minmax(0, 1fr)`, or it overflows on a phone.
+- A config key only the worker reads says so in the example env file.
+- A scheduled pull may prepare the morning, but it never starts a run on its own.
+
+### P8 · A work cycle
+
+```text
+Add a work cycle to my harness dashboard. Read the "Next level: a work cycle" section of
+https://harness-info.vercel.app/en/build-dashboard. Start with Settings: a preflight whose checks name the steps they
+are required for, fail closed. Then a /cycle page with a stepper (open, pull, triage, select, batch, run, report,
+finish), one primary action per step and the reason beside a disabled one. Triage proposals come from an agent and a
+person confirms; batches are grouped by code, not by a model. Everything outward-facing previews first. Interview me
+about my steps and my repositories before you write the plan.
 ```

@@ -14,7 +14,7 @@
           "id": "pick",
           "layer": "runner",
           "state": "running",
-          "files": ["supervisor.lock", "running.json", "unit-seq", "unit-0001.agents.json"],
+          "files": ["supervisor.lock", "running/0001.json", "unit-seq", "unit-0001.agents.json"],
           "units": [
             {
               "n": 1,
@@ -27,7 +27,7 @@
           "id": "work",
           "layer": "specialists",
           "state": "running",
-          "files": ["supervisor.lock", "running.json", "unit-seq", "unit-0001.agents.json", "unit-0001.jsonl"],
+          "files": ["supervisor.lock", "running/0001.json", "unit-seq", "unit-0001.agents.json", "unit-0001.jsonl"],
           "units": [
             {
               "n": 1,
@@ -40,7 +40,7 @@
           "id": "check",
           "layer": "contracts",
           "state": "running",
-          "files": ["supervisor.lock", "running.json", "unit-seq", "unit-0001.agents.json", "unit-0001.jsonl", "handoffs.jsonl"],
+          "files": ["supervisor.lock", "running/0001.json", "unit-seq", "unit-0001.agents.json", "unit-0001.jsonl", "handoffs.jsonl"],
           "units": [
             {
               "n": 1,
@@ -54,7 +54,7 @@
           "id": "next",
           "layer": "runner",
           "state": "running",
-          "files": ["supervisor.lock", "running.json", "unit-seq", "unit-0002.agents.json", "unit-0002.jsonl", "handoffs.jsonl"],
+          "files": ["supervisor.lock", "running/0002.json", "unit-seq", "unit-0002.agents.json", "unit-0002.jsonl", "handoffs.jsonl"],
           "units": [
             {
               "n": 1,
@@ -104,7 +104,7 @@
           "id": "run",
           "layer": "specialists",
           "state": "running",
-          "files": ["supervisor.lock", "running.json"],
+          "files": ["supervisor.lock", "running/0004.json"],
           "units": [
             {
               "n": 4,
@@ -117,7 +117,7 @@
           "id": "write",
           "layer": "specialists",
           "state": "running",
-          "files": ["supervisor.lock", "running.json", "PAUSE"],
+          "files": ["supervisor.lock", "running/0004.json", "PAUSE"],
           "units": [
             {
               "n": 4,
@@ -130,7 +130,7 @@
           "id": "finish",
           "layer": "contracts",
           "state": "running",
-          "files": ["supervisor.lock", "running.json", "PAUSE"],
+          "files": ["supervisor.lock", "running/0004.json", "PAUSE"],
           "units": [
             {
               "n": 4,
@@ -158,7 +158,7 @@
           "id": "resume",
           "layer": "runner",
           "state": "running",
-          "files": ["supervisor.lock", "running.json"],
+          "files": ["supervisor.lock", "running/0005.json"],
           "units": [
             {
               "n": 4,
@@ -182,7 +182,7 @@
           "id": "run",
           "layer": "specialists",
           "state": "running",
-          "files": ["supervisor.lock", "running.json"],
+          "files": ["supervisor.lock", "running/0007.json"],
           "units": [
             {
               "n": 7,
@@ -196,7 +196,7 @@
           "layer": "specialists",
           "state": "running",
           "danger": true,
-          "files": ["supervisor.lock", "running.json"],
+          "files": ["supervisor.lock", "running/0007.json"],
           "units": [
             {
               "n": 7,
@@ -210,7 +210,7 @@
           "layer": "contracts",
           "state": "running",
           "danger": true,
-          "files": ["supervisor.lock", "running.json"],
+          "files": ["supervisor.lock", "running/0007.json"],
           "units": [
             {
               "n": 7,
@@ -225,7 +225,7 @@
           "layer": "runner",
           "state": "running",
           "danger": true,
-          "files": ["supervisor.lock", "running.json", "handoffs.jsonl"],
+          "files": ["supervisor.lock", "running/0007.json", "handoffs.jsonl"],
           "units": [
             {
               "n": 7,
@@ -239,7 +239,7 @@
           "id": "next",
           "layer": "runner",
           "state": "running",
-          "files": ["supervisor.lock", "running.json", "handoffs.jsonl"],
+          "files": ["supervisor.lock", "running/0008.json", "handoffs.jsonl"],
           "units": [
             {
               "n": 7,
@@ -263,7 +263,7 @@
           "id": "start",
           "layer": "coordinator",
           "state": "running",
-          "files": ["supervisor.lock", "running.json"],
+          "files": ["supervisor.lock", "running/0009.json"],
           "units": [
             {
               "n": 9,
@@ -277,7 +277,7 @@
           "layer": "coordinator",
           "state": "running",
           "danger": true,
-          "files": ["supervisor.lock", "running.json"],
+          "files": ["supervisor.lock", "running/0009.json"],
           "units": [
             {
               "n": 9,
@@ -305,7 +305,7 @@
           "id": "retry",
           "layer": "contracts",
           "state": "running",
-          "files": ["supervisor.lock", "running.json"],
+          "files": ["supervisor.lock", "running/0010.json"],
           "units": [
             {
               "n": 9,
@@ -330,7 +330,7 @@
           "id": "run",
           "layer": "specialists",
           "state": "running",
-          "files": ["supervisor.lock", "running.json"],
+          "files": ["supervisor.lock", "running/0011.json"],
           "units": [
             {
               "n": 11,
@@ -343,7 +343,7 @@
           "id": "write",
           "layer": "specialists",
           "state": "running",
-          "files": ["supervisor.lock", "running.json", "STOP"],
+          "files": ["supervisor.lock", "running/0011.json", "STOP"],
           "units": [
             {
               "n": 11,
@@ -356,7 +356,7 @@
           "id": "finish",
           "layer": "contracts",
           "state": "running",
-          "files": ["supervisor.lock", "running.json", "STOP"],
+          "files": ["supervisor.lock", "running/0011.json", "STOP"],
           "units": [
             {
               "n": 11,

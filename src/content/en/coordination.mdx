@@ -111,9 +111,10 @@ A fresh context remembers nothing, so the runner writes a short memory into ever
 
 1. **measured facts** — the task's status and bounces, its last handoffs with their verdicts and reasons, and the diff
    stat of its branch;
-2. **the tail of the task's `## Log`**;
-3. **the tail of `JOURNAL.md`** — the notes earlier units left for later ones;
-4. **the other tasks on the board** — id, status and title, for spec and plan units only, so a spec never recommends what another task already does. A task with a branch also says whether it is
+2. **the lessons in force** — every rule a person applied on the Learning page, in full, from `.harness/LESSONS.md`;
+3. **the tail of the task's `## Log`**;
+4. **the tail of `JOURNAL.md`** — the notes earlier units left for later ones;
+5. **the other tasks on the board** — id, status and title, for spec and plan units only, so a spec never recommends what another task already does. A task with a branch also says whether it is
    merged into the base branch or not yet, so a plan never builds on work that is not there.
 
 Facts come first because a journal entry is one agent's opinion, and a status in a file is not. No hook is involved and

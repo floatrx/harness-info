@@ -8,13 +8,14 @@ harness projects list
 **Add a project** on the dashboard's Projects page does the same. `projects add` registers the repository in
 `$HARNESS_HOME/projects.json`, which is `~/.harness/projects.json` by default. It creates this in your repository:
 
-| Path                   | What it is                                             | In git         |
-| ---------------------- | ------------------------------------------------------ | -------------- |
-| `.harness/config.json` | the project's settings                                 | yes, versioned |
-| `.harness/tasks/`      | one Markdown file per task                             | no             |
-| `.harness/trace/`      | the evidence every unit leaves                         | no             |
-| `.harness/JOURNAL.md`  | notes agents leave for the next unit                   | no             |
-| `.harness/worktrees/`  | one git worktree per task, made by its first code unit | no             |
+| Path                   | What it is                                                                  | In git         |
+| ---------------------- | --------------------------------------------------------------------------- | -------------- |
+| `.harness/config.json` | the project's settings                                                      | yes, versioned |
+| `.harness/tasks/`      | one Markdown file per task                                                  | no             |
+| `.harness/trace/`      | the evidence every unit leaves                                              | no             |
+| `.harness/JOURNAL.md`  | notes agents leave for the next unit                                        | no             |
+| `.harness/LESSONS.md`  | the rules a person applied on the Learning page; made at the first decision | no             |
+| `.harness/worktrees/`  | one git worktree per task, made by its first code unit                      | no             |
 
 It appends those paths, `.harness/artifacts/` and `.env` to the project's `.gitignore`. A project added before
 worktrees existed gets `.harness/worktrees/` in `.git/info/exclude` instead, when its first worktree is made. A folder counts as a harness
@@ -56,6 +57,7 @@ Every other key keeps its default in code, so a changed default reaches every pr
 | `limits.bounces`               | `2`               | how many rejections park a task for you                            | [Contracts](/contracts)      |
 | `limits.prototypeRounds`       | `3`               | the most prototype rounds per task                                 | [Task lifecycle](/lifecycle) |
 | `limits.unitTimeoutMinutes`    | `60`              | a unit that runs longer is a hard stop                             | [Contracts](/contracts)      |
+| `limits.parallel`              | `1`               | how many units run at once, one per task; code units side by side  | [Running the loop](/loop)    |
 | `gate`                         | `null`            | the project's check command; a task's own `gate:` wins             | [Contracts](/contracts)      |
 | `probe`                        | `null`            | a command that must exit 0 before a unit starts                    | [Contracts](/contracts)      |
 | `deliver.pr`, `deliver.remote` | `false`, `origin` | push the branch and open a pull request for a done task            | [Task lifecycle](/lifecycle) |
